@@ -5,7 +5,6 @@ import Swiper from "react-native-swiper";
 export default function Intro() {
   return (
     <Swiper loop={false} showsPagination>
-      {/* Page 1 */}
       <View className="flex-1 bg-blue-500 items-center justify-center p-6">
         <Text className="text-white text-3xl font-bold">Welcome</Text>
         <Text className="text-white mt-4 text-center">
@@ -13,7 +12,6 @@ export default function Intro() {
         </Text>
       </View>
 
-      {/* Page 2 */}
       <View className="flex-1 bg-purple-500 items-center justify-center p-6">
         <Text className="text-white text-3xl font-bold">Book Fast</Text>
         <Text className="text-white mt-4 text-center">
@@ -21,7 +19,6 @@ export default function Intro() {
         </Text>
       </View>
 
-      {/* Page 3 */}
       <View className="flex-1 bg-green-500 items-center justify-center p-6">
         <Text className="text-white text-3xl font-bold">Get Started</Text>
 
