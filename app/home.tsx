@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   FlatList,
@@ -10,7 +10,6 @@ import {
   TextInput,
   View,
 } from "react-native";
-import AnimatedTabBar from "./_components/animation-bar";
 
 const heroSlides = [
   {
@@ -131,7 +130,7 @@ export default function Home() {
         </ImageBackground>
 
         <View className="p-6">
-          <Text className="text-5xl font-extrabold text-black mb-2">
+          <Text className="text-5xl font-extrabold text-yellow-400 mb-2">
             Find Your Guide
           </Text>
           <Text className="text-lg text-gray-600 mb-6">
@@ -175,22 +174,30 @@ export default function Home() {
             showsHorizontalScrollIndicator={false}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <View className="bg-gray-100 rounded-2xl p-4 w-56 mr-4 ">
-                <Image
-                  source={{ uri: item.photo }}
-                  className="w-full h-28 rounded-xl mb-2"
-                />
+              <Link
+                href={{
+                  pathname: "/guides/[id]",
+                  params: { id: item.id },
+                }}
+                asChild
+              >
+                <Pressable className="bg-gray-100 rounded-2xl p-4 w-56 mr-4 ">
+                  <Image
+                    source={{ uri: item.photo }}
+                    className="w-full h-28 rounded-xl mb-2"
+                  />
 
-                <Text className="font-bold text-lg text-black">
-                  {item.name}
-                </Text>
-                <Text className="text-gray-700">
-                  ⭐ {item.rating} | ${item.price}/day
-                </Text>
-                <Text className="text-gray-500">
-                  Languages: {item.languages}
-                </Text>
-              </View>
+                  <Text className="font-bold text-lg text-black">
+                    {item.name}
+                  </Text>
+                  <Text className="text-gray-700">
+                    ⭐ {item.rating} | ${item.price}/day
+                  </Text>
+                  <Text className="text-gray-500">
+                    Languages: {item.languages}
+                  </Text>
+                </Pressable>
+              </Link>
             )}
           />
         </View>
@@ -226,9 +233,9 @@ export default function Home() {
               <Pressable
                 key={action}
                 onPress={() => router.push(`/${action.toLowerCase()}` as any)}
-                className="bg-black rounded-xl shadow p-4 w-[45%] m-2"
+                className="bg-yellow-400 rounded-xl p-4 w-[45%] m-2"
               >
-                <Text className="text-white font-semibold text-center capitalize">
+                <Text className="font-semibold text-center capitalize">
                   {action}
                 </Text>
               </Pressable>
@@ -264,8 +271,6 @@ export default function Home() {
           </View>
         ))}
       </ScrollView>
-
-      <AnimatedTabBar />
     </View>
   );
 }

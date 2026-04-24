@@ -2,28 +2,34 @@
 
 import { usePathname, useRouter } from "expo-router";
 import { useEffect } from "react";
-import { Dimensions, Pressable, View } from "react-native";
+import { Dimensions, Pressable, Text, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const TABS = ["Home", "Guides", "Cities", "Bookings", "Profile"];
+const TABS = ["home", "guides", "cities", "bookings"];
+
 const { width } = Dimensions.get("window");
 const TAB_WIDTH = width / TABS.length;
 
 export default function AnimatedTabBar() {
   const router = useRouter();
   const pathname = usePathname();
+  const insets = useSafeAreaInsets();
 
-  const activeIndex = TABS.findIndex((t) => pathname === `/${t.toLowerCase()}`);
+  const activeIndex = Math.max(
+    0,
+    TABS.findIndex((t) => pathname.startsWith(`/${t}`)),
+  );
 
   const translateX = useSharedValue(activeIndex * TAB_WIDTH);
 
   useEffect(() => {
     translateX.value = withTiming(activeIndex * TAB_WIDTH, {
-      duration: 250,
+      duration: 300,
     });
   }, [activeIndex]);
 
@@ -32,29 +38,30 @@ export default function AnimatedTabBar() {
   }));
 
   return (
-    <View className="border-t border-gray-200 py-4">
-      {/* Indicator */}
-      {/* <Animated.View
+    <View style={{ paddingBottom: insets.bottom }}>
+      {/* 🔥 Sliding pill indicator */}
+      <Animated.View
         style={[
           {
             position: "absolute",
-            bottom: 0,
-            width: TAB_WIDTH,
-            height: 3,
-            backgroundColor: "#22c55e",
+            height: 40,
+            width: TAB_WIDTH - 16,
+            marginHorizontal: 8,
+            top: 8,
+            borderRadius: 999,
+            backgroundColor: "#f9f871",
           },
           indicatorStyle,
         ]}
-      /> */}
+      />
 
-      <View className="flex-row">
+      <View className="flex-row py-2">
         {TABS.map((tab, index) => (
           <TabItem
             key={tab}
             tab={tab}
-            index={index}
             isActive={index === activeIndex}
-            onPress={() => router.push(`/${tab.toLowerCase()}` as any)}
+            onPress={() => router.push(`/${tab}` as any)}
           />
         ))}
       </View>
@@ -68,32 +75,32 @@ function TabItem({
   onPress,
 }: {
   tab: string;
-  index: number;
   isActive: boolean;
   onPress: () => void;
 }) {
-  const scale = useSharedValue(isActive ? 1.2 : 1);
+  const scale = useSharedValue(isActive ? 1.1 : 1);
+  const translateY = useSharedValue(isActive ? -4 : 0);
 
   useEffect(() => {
-    scale.value = withTiming(isActive ? 1.2 : 1, {
-      duration: 200,
-    });
+    scale.value = withTiming(isActive ? 1.1 : 1, { duration: 200 });
+    translateY.value = withTiming(isActive ? -4 : 0, { duration: 200 });
   }, [isActive]);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
+    transform: [{ scale: scale.value }, { translateY: translateY.value }],
   }));
 
   return (
     <Pressable onPress={onPress} className="flex-1 items-center">
-      <Animated.Text
-        style={animatedStyle}
-        className={`font-semibold ${
-          isActive ? "text-green-500" : "text-white"
-        }`}
-      >
-        {tab}
-      </Animated.Text>
+      <Animated.View style={animatedStyle}>
+        <Text
+          className={`text-sm font-semibold ${
+            isActive ? "text-yellow-400" : "text-gray-400"
+          }`}
+        >
+          {tab.toUpperCase()}
+        </Text>
+      </Animated.View>
     </Pressable>
   );
 }
