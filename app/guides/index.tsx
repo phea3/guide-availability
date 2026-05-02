@@ -1,5 +1,5 @@
 import { Link } from "expo-router";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { FlatList, ImageBackground, Pressable, Text, View } from "react-native";
 
 const guides = [
   { id: "1", name: "John", available: true },
@@ -8,9 +8,15 @@ const guides = [
 
 export default function Guides() {
   return (
-    <View className="flex-1 bg-gray-100 p-6">
+    <ImageBackground
+      source={require("../../assets/images/pattern-background.png")}
+      resizeMode="cover"
+      className="flex-1 justify-center align-middle border-t border-gray-200"
+    >
+      <View className="absolute inset-0 bg-white/95" />
       <FlatList
         data={guides}
+        className="h-full w-full m-6"
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <Link
@@ -31,6 +37,6 @@ export default function Guides() {
           </Link>
         )}
       />
-    </View>
+    </ImageBackground>
   );
 }

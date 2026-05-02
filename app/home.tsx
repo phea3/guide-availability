@@ -1,3 +1,4 @@
+import { BlurView } from "expo-blur";
 import { Link, router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -115,11 +116,17 @@ export default function Home() {
   const slide = heroSlides[currentSlide];
 
   return (
-    <View className="flex-1 bg-white">
+    <ImageBackground
+      source={require("../assets/images/pattern-background.png")}
+      resizeMode="cover"
+      className="flex-1 justify-center align-middle border-t border-gray-200"
+    >
+      <View className="absolute inset-0 bg-white/95" />
+
       <ScrollView showsVerticalScrollIndicator={false}>
         <ImageBackground
           source={{ uri: slide.photo }}
-          className="h-56 justify-end items-start p-2"
+          className="h-56 justify-end items-start p-2 m-6 rounded-2xl overflow-hidden"
         >
           <View className="bg-black/50 p-4 rounded-xl">
             <Text className="text-3xl font-extrabold text-white">
@@ -128,7 +135,6 @@ export default function Home() {
             <Text className="text-lg text-gray-200">{slide.subtitle}</Text>
           </View>
         </ImageBackground>
-
         <View className="p-6">
           <Text className="text-5xl font-extrabold text-yellow-400 mb-2">
             Find Your Guide
@@ -157,9 +163,13 @@ export default function Home() {
             showsHorizontalScrollIndicator={false}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <View className=" rounded-2xl bg-gray-100 mr-4 p-6 w-64">
+              <BlurView
+                intensity={40}
+                tint="light"
+                className="rounded-2xl mr-4 p-6 w-64 bg-white/20 border border-white/30"
+              >
                 <Text className="font-bold text-lg ">{item.text}</Text>
-              </View>
+              </BlurView>
             )}
           />
         </View>
@@ -235,7 +245,7 @@ export default function Home() {
                 onPress={() => router.push(`/${action.toLowerCase()}` as any)}
                 className="bg-yellow-400 rounded-xl p-4 w-[45%] m-2"
               >
-                <Text className="font-semibold text-center capitalize">
+                <Text className="font-semibold text-center capitalize text-white">
                   {action}
                 </Text>
               </Pressable>
@@ -248,10 +258,7 @@ export default function Home() {
           Testimonials
         </Text>
         {testimonials.map((t) => (
-          <View
-            key={t.id}
-            className="bg-gray-100 rounded-2xl shadow p-4 mx-6 mb-4"
-          >
+          <View key={t.id} className="bg-gray-100 rounded-2xl  p-4 mx-6 mb-4">
             <Text className="text-gray-800 italic">{t.text}</Text>
           </View>
         ))}
@@ -260,10 +267,7 @@ export default function Home() {
           Upcoming Events
         </Text>
         {events.map((e) => (
-          <View
-            key={e.id}
-            className="bg-gray-100 rounded-2xl shadow p-4 mx-6 mb-4"
-          >
+          <View key={e.id} className="bg-gray-100 rounded-2xl  p-4 mx-6 mb-4">
             <Text className="font-bold text-lg text-black">{e.name}</Text>
             <Text className="text-gray-600">
               {e.date} — {e.location}
@@ -271,6 +275,6 @@ export default function Home() {
           </View>
         ))}
       </ScrollView>
-    </View>
+    </ImageBackground>
   );
 }
