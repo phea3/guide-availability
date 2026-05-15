@@ -1,3 +1,4 @@
+import Providers from "@/providers/provider";
 import { Stack, usePathname } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -15,24 +16,43 @@ export default function RootLayout() {
           style={{ flex: 1 }}
           edges={isAuthScreen ? ["left", "right"] : ["top", "left", "right"]}
         >
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              animation: "fade",
-            }}
-          >
-            <Stack.Screen name="index" />
-            <Stack.Screen name="login" />
-            <Stack.Screen name="home" />
-            <Stack.Screen name="guides/index" />
-            <Stack.Screen name="cities/index" />
-            <Stack.Screen name="promotions/index" />
-            <Stack.Screen name="favorites/index" />
-            <Stack.Screen name="bookings/index" />
-            <Stack.Screen name="guides/[id]" />
-          </Stack>
+          <Providers>
+            <Stack
+              screenOptions={{
+                headerShown: false,
+              }}
+            >
+              <Stack.Screen name="index" options={{ animation: "fade" }} />
+              <Stack.Screen name="login" options={{ animation: "fade" }} />
+              <Stack.Screen name="home" options={{ animation: "fade" }} />
+              <Stack.Screen
+                name="guides/index"
+                options={{ animation: "fade" }}
+              />
+              <Stack.Screen
+                name="cities/index"
+                options={{ animation: "default" }}
+              />
+              <Stack.Screen
+                name="promotions/index"
+                options={{ animation: "default" }}
+              />
+              <Stack.Screen
+                name="favorites/index"
+                options={{ animation: "default" }}
+              />
+              <Stack.Screen
+                name="bookings/index"
+                options={{ animation: "default" }}
+              />
+              <Stack.Screen
+                name="guides/[id]"
+                options={{ animation: "default" }}
+              />
+            </Stack>
 
-          {!isAuthScreen && <AnimatedTabBar />}
+            {!isAuthScreen && <AnimatedTabBar />}
+          </Providers>
         </SafeAreaView>
       </SafeAreaProvider>
     </GestureHandlerRootView>

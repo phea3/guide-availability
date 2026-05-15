@@ -15,8 +15,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const TABS = [
   { name: "home", icon: "home" },
   { name: "guides", icon: "people" },
-  { name: "cities", icon: "location" },
-  { name: "bookings", icon: "calendar" },
+  // { name: "cities", icon: "location" },
+  // { name: "bookings", icon: "calendar" },
   { name: "hide", icon: "arrow-down" },
 ];
 
@@ -121,7 +121,26 @@ export default function AnimatedTabBar() {
                     if (tab.name === "hide") {
                       hideTabBar(); // special case
                     } else {
-                      router.push(`/${tab.name}` as any);
+                      // restrict navigation for top-level tabs
+                      const topLevelTabs = [
+                        "home",
+                        "guides",
+                        "cities",
+                        "promotions",
+                        "favorites",
+                        "bookings",
+                        "guides",
+                      ];
+
+                      if (topLevelTabs.includes(tab.name)) {
+                        // only push if not already at that top-level path
+                        if (pathname !== `/${tab.name}`) {
+                          router.replace(`/${tab.name}` as any);
+                        }
+                      } else {
+                        // normal behavior for other tabs
+                        router.push(`/${tab.name}` as any);
+                      }
                     }
                   }}
                 />

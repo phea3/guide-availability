@@ -1,5 +1,5 @@
-import { BlurView } from "expo-blur";
-import { Link, router } from "expo-router";
+import { useGetGuide } from "@/hook/use-all-guide";
+import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   FlatList,
@@ -37,25 +37,6 @@ const promos = [
   { id: "1", text: "⚡ Free Tuk-Tuk Ride in Phnom Penh" },
   { id: "2", text: "🎟️ 20% off Angkor Wat Tours" },
   { id: "3", text: "🍲 Complimentary Local Lunch in Siem Reap" },
-];
-
-const guides = [
-  {
-    id: "1",
-    name: "John",
-    rating: 4.8,
-    price: 50,
-    languages: "English, Khmer",
-    photo: "https://picsum.photos/id/870/200/300?grayscale&blur=2",
-  },
-  {
-    id: "2",
-    name: "Sokha",
-    rating: 4.7,
-    price: 40,
-    languages: "Khmer, French",
-    photo: "https://picsum.photos/200/300/?blur",
-  },
 ];
 
 const cities = [
@@ -106,6 +87,8 @@ const events = [
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  const { data: guides } = useGetGuide();
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
@@ -124,6 +107,10 @@ export default function Home() {
       <View className="absolute inset-0 bg-white/95" />
 
       <ScrollView showsVerticalScrollIndicator={false}>
+        <Image
+          source={require("../assets/images/trimmed-image.png")}
+          className="w-1/3 h-8 mt-4 object-contain left-6"
+        />
         <ImageBackground
           source={{ uri: slide.photo }}
           className="h-56 justify-end items-start p-2 m-6 rounded-2xl overflow-hidden"
@@ -136,9 +123,9 @@ export default function Home() {
           </View>
         </ImageBackground>
         <View className="p-6">
-          <Text className="text-5xl font-extrabold text-yellow-400 mb-2">
+          {/* <Text className="text-5xl font-extrabold text-yellow-400 mb-2">
             Find Your Guide
-          </Text>
+          </Text> */}
           <Text className="text-lg text-gray-600 mb-6">
             Explore Cambodia with trusted local guides
           </Text>
@@ -153,7 +140,7 @@ export default function Home() {
           </Text>
         </View>
 
-        <Text className="text-2xl font-bold text-black px-6 mb-4">
+        {/* <Text className="text-2xl font-bold text-black px-6 mb-4">
           Promotions
         </Text>
         <View className="px-6">
@@ -172,7 +159,7 @@ export default function Home() {
               </BlurView>
             )}
           />
-        </View>
+        </View> */}
 
         <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
           Top Guides
@@ -193,18 +180,16 @@ export default function Home() {
               >
                 <Pressable className="bg-gray-100 rounded-2xl p-4 w-56 mr-4 ">
                   <Image
-                    source={{ uri: item.photo }}
+                    source={{ uri: item.profileImage }}
                     className="w-full h-28 rounded-xl mb-2"
                   />
 
                   <Text className="font-bold text-lg text-black">
-                    {item.name}
+                    {item.guideName}
                   </Text>
-                  <Text className="text-gray-700">
-                    ⭐ {item.rating} | ${item.price}/day
-                  </Text>
+                  <Text className="text-gray-700">⭐ 10/day</Text>
                   <Text className="text-gray-500">
-                    Languages: {item.languages}
+                    Languages: {item.address}
                   </Text>
                 </Pressable>
               </Link>
@@ -212,7 +197,7 @@ export default function Home() {
           />
         </View>
 
-        <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
+        {/* <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
           Explore Cities
         </Text>
         <View className="px-6">
@@ -233,8 +218,8 @@ export default function Home() {
               </View>
             )}
           />
-        </View>
-        <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
+        </View> */}
+        {/* <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
           Quick Actions
         </Text>
         <View className="flex-row flex-wrap px-6">
@@ -251,17 +236,17 @@ export default function Home() {
               </Pressable>
             ),
           )}
-        </View>
+        </View> */}
 
         {/* Testimonials */}
-        <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
+        {/* <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
           Testimonials
         </Text>
         {testimonials.map((t) => (
           <View key={t.id} className="bg-gray-100 rounded-2xl  p-4 mx-6 mb-4">
             <Text className="text-gray-800 italic">{t.text}</Text>
           </View>
-        ))}
+        ))} */}
 
         <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
           Upcoming Events
