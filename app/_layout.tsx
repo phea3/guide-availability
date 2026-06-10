@@ -4,10 +4,12 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import "../global.css";
 import AnimatedTabBar from "./_components/animation-bar";
+
 export default function RootLayout() {
   const pathname = usePathname();
 
-  const isAuthScreen = pathname === "/" || pathname === "/login";
+  const isAuthScreen =
+    pathname === "/" || pathname === "/login" || pathname === "/register";
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -22,8 +24,9 @@ export default function RootLayout() {
                 headerShown: false,
               }}
             >
-              <Stack.Screen name="index" options={{ animation: "fade" }} />
+              {/* <Stack.Screen name="index" options={{ animation: "fade" }} /> */}
               <Stack.Screen name="login" options={{ animation: "fade" }} />
+              <Stack.Screen name="register" options={{ animation: "fade" }} />
               <Stack.Screen name="home" options={{ animation: "fade" }} />
               <Stack.Screen
                 name="guides/index"
@@ -31,7 +34,7 @@ export default function RootLayout() {
               />
               <Stack.Screen
                 name="cities/index"
-                options={{ animation: "default" }}
+                options={{ animation: "fade" }}
               />
               <Stack.Screen
                 name="promotions/index"
@@ -43,7 +46,7 @@ export default function RootLayout() {
               />
               <Stack.Screen
                 name="bookings/index"
-                options={{ animation: "default" }}
+                options={{ animation: "fade" }}
               />
               <Stack.Screen
                 name="guides/[id]"

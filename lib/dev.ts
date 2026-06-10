@@ -1,3 +1,3 @@
 export const getServerUri = () => {
-  return "http://192.168.0.103:3000";
+  return process.env.EXPO_PUBLIC_SERVER_URL;
 };

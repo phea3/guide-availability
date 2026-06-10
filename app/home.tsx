@@ -1,5 +1,6 @@
 import { useGetGuide } from "@/hook/use-all-guide";
-import { Link } from "expo-router";
+import { BlurView } from "expo-blur";
+import { Link, router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   FlatList,
@@ -102,7 +103,7 @@ export default function Home() {
     <ImageBackground
       source={require("../assets/images/pattern-background.png")}
       resizeMode="cover"
-      className="flex-1 justify-center align-middle border-t border-gray-200"
+      className="flex-1 justify-center align-middle "
     >
       <View className="absolute inset-0 bg-white/95" />
 
@@ -140,7 +141,7 @@ export default function Home() {
           </Text>
         </View>
 
-        {/* <Text className="text-2xl font-bold text-black px-6 mb-4">
+        <Text className="text-2xl font-bold text-black px-6 mb-4">
           Promotions
         </Text>
         <View className="px-6">
@@ -159,7 +160,7 @@ export default function Home() {
               </BlurView>
             )}
           />
-        </View> */}
+        </View>
 
         <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
           Top Guides
@@ -197,7 +198,7 @@ export default function Home() {
           />
         </View>
 
-        {/* <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
+        <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
           Explore Cities
         </Text>
         <View className="px-6">
@@ -218,8 +219,8 @@ export default function Home() {
               </View>
             )}
           />
-        </View> */}
-        {/* <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
+        </View>
+        <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
           Quick Actions
         </Text>
         <View className="flex-row flex-wrap px-6">
@@ -236,17 +237,17 @@ export default function Home() {
               </Pressable>
             ),
           )}
-        </View> */}
+        </View>
 
         {/* Testimonials */}
-        {/* <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
+        <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
           Testimonials
         </Text>
         {testimonials.map((t) => (
           <View key={t.id} className="bg-gray-100 rounded-2xl  p-4 mx-6 mb-4">
             <Text className="text-gray-800 italic">{t.text}</Text>
           </View>
-        ))} */}
+        ))}
 
         <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
           Upcoming Events
