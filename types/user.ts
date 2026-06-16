@@ -1,0 +1,21 @@
+export type UserType = {
+  id: string;
+  fullName?: string;
+  username?: string;
+  email?: string;
+  phoneNumber?: string;
+  verifiedEmail?: string;
+  hashPassword?: string;
+  imageProfile?: string;
+  role?: string;
+  status?: string;
+  isRegisterUser?: string;
+  isVerified?: string;
+  isFirstLogin?: string;
+  otpCode?: string;
+  expireOtp?: string;
+  description?: string;
+  lastResetPasswordAt?: string;
+  lastLoginAt?: string;
+  createdAt?: string;
+};

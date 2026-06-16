@@ -29,6 +29,10 @@ export default function RootLayout() {
               <Stack.Screen name="register" options={{ animation: "fade" }} />
               <Stack.Screen name="home" options={{ animation: "fade" }} />
               <Stack.Screen
+                name="profile/index"
+                options={{ animation: "fade" }}
+              />
+              <Stack.Screen
                 name="guides/index"
                 options={{ animation: "fade" }}
               />

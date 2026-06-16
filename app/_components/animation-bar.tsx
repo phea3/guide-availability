@@ -1,11 +1,10 @@
 "use client";
 
-import { AuthStorage } from "@/auth/auth-acess-token";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { usePathname, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { Dimensions, Modal, Pressable, Text, View } from "react-native";
+import { Dimensions, Pressable, Text, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -18,7 +17,7 @@ const TABS = [
   { name: "guides", icon: "people" },
   { name: "cities", icon: "location" },
   { name: "bookings", icon: "calendar" },
-  { name: "logout", icon: "log-out" },
+  { name: "profile", icon: "person" },
   { name: "hide", icon: "arrow-down" },
 ];
 
@@ -29,7 +28,6 @@ export default function AnimatedTabBar() {
   const router = useRouter();
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const activeIndex = Math.max(
     0,
@@ -128,9 +126,6 @@ export default function AnimatedTabBar() {
                   onPress={() => {
                     if (tab.name === "hide") {
                       hideTabBar(); // special case
-                    } else if (tab.name === "logout") {
-                      setShowLogoutModal(true);
-                      return;
                     } else {
                       // restrict navigation for top-level tabs
                       const topLevelTabs = [
@@ -160,47 +155,6 @@ export default function AnimatedTabBar() {
           </BlurView>
         </View>
       </Animated.View>
-
-      <Modal
-        transparent
-        visible={showLogoutModal}
-        animationType="fade"
-        onRequestClose={() => setShowLogoutModal(false)}
-      >
-        <View className="flex-1 items-center justify-center bg-black/50 px-6">
-          <View className="w-full max-w-sm rounded-3xl bg-white p-6">
-            <Text className="mb-2 text-lg font-bold">Logout</Text>
-
-            <Text className="mb-6 text-gray-600">
-              Are you sure you want to logout?
-            </Text>
-
-            <View className="flex-row gap-3">
-              <Pressable
-                onPress={() => setShowLogoutModal(false)}
-                className="flex-1 rounded-xl border border-gray-300 py-3"
-              >
-                <Text className="text-center font-medium">Cancel</Text>
-              </Pressable>
-
-              <Pressable
-                onPress={async () => {
-                  setShowLogoutModal(false);
-
-                  await AuthStorage.logout();
-
-                  router.replace("/login");
-                }}
-                className="flex-1 rounded-xl bg-red-500 py-3"
-              >
-                <Text className="text-center font-medium text-white">
-                  Logout
-                </Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </>
   );
 }

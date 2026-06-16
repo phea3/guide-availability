@@ -8,7 +8,7 @@ export default function BackButtonDefault() {
   const router = useRouter();
 
   return (
-    <View className="p-4 absolute top-10">
+    <View className="p-10 absolute top-10">
       <TouchableOpacity
         onPress={() => router.back()}
         className="w-10 h-10 flex items-center justify-center rounded-full bg-black"
