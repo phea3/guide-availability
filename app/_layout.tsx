@@ -2,6 +2,7 @@ import Providers from "@/providers/provider";
 import { Stack, usePathname } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 import "../global.css";
 import AnimatedTabBar from "./_components/animation-bar";
 
@@ -57,7 +58,7 @@ export default function RootLayout() {
                 options={{ animation: "default" }}
               />
             </Stack>
-
+            <Toast />
             {!isAuthScreen && <AnimatedTabBar />}
           </Providers>
         </SafeAreaView>
