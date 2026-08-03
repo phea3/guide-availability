@@ -5,7 +5,7 @@ import { useGetUserById } from "@/hook/use-user-id";
 import { UserType } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Image,
@@ -156,6 +156,23 @@ export default function ProfilePage() {
                 <Text className="text-lg ">
                   {user.username}, you aren&apos;t verified yet
                 </Text>
+              </View>
+            )}
+
+            {user.role === "Guide" && (
+              <View className="rounded-3xl bg-gray-100 p-4">
+                <Text className="">Setup</Text>
+                <Link
+                  href={{
+                    pathname: "/guides/[id]",
+                    params: { id: user.id },
+                  }}
+                  asChild
+                >
+                  <Pressable className="bg-blue-100 p-4 mb-2 mt-2 rounded-2xl">
+                    <Text className="font-bold text-lg">Chick here</Text>
+                  </Pressable>
+                </Link>
               </View>
             )}
 
