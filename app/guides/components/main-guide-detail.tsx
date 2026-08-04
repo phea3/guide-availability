@@ -1,0 +1,195 @@
+import BackButton from "@/app/_components/back-button";
+import GlassCalendar from "@/components/glass-calendar";
+import {
+  AvailableDayModel,
+  useAddAvailableDay,
+} from "@/hook/use-add-available-day";
+import { useGetAvailableDays } from "@/hook/use-available-days";
+import { useDeleteAvailableDay } from "@/hook/use-delete-available-day";
+import { useGetGuideById } from "@/hook/use-guide-id";
+import { useUpdateAvailableDay } from "@/hook/use-update-available-day";
+import { AvailableDraftDayType } from "@/types/availability";
+import { useLocalSearchParams } from "expo-router";
+import { useState } from "react";
+import { FlatList, ImageBackground, Text, View } from "react-native";
+import Toast from "react-native-toast-message";
+import AvailableDayItem from "./available-day-item";
+import SetupForm from "./setup-form";
+import SwitchButtonView from "./switch-button-view";
+
+export default function MainGuideDetail() {
+  const available = useAddAvailableDay();
+  const updateAvailable = useUpdateAvailableDay();
+  const deleteAvailable = useDeleteAvailableDay();
+  const { data: availableDays } = useGetAvailableDays();
+  const params = useLocalSearchParams();
+  const [status, setStatus] = useState(true);
+  const [remark, setRemark] = useState("");
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [activeView, setActiveView] = useState<"calendar" | "setup">(
+    "calendar",
+  );
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
+  const { data: guide, isPending } = useGetGuideById(id);
+
+  if (isPending) {
+    return (
+      <View className="flex-1 items-center justify-center bg-gray-100">
+        <Text className="text-lg font-bold">Fetching...</Text>
+      </View>
+    );
+  }
+
+  if (!guide) {
+    return (
+      <View className="flex-1 items-center justify-center bg-gray-100">
+        <Text className="text-lg font-bold">Guide not found</Text>
+      </View>
+    );
+  }
+
+  const handleAddAvailable = (data: AvailableDayModel) => {
+    available.mutate(
+      {
+        userId: guide?.id,
+        startDate: data.startDate || undefined,
+        endDate: data.endDate || undefined,
+        status: data.status || undefined,
+        remark: data.remark,
+      },
+      {
+        onSuccess: async () => {
+          Toast.show({
+            type: "success",
+            text1: "Success",
+            text2: "Add day.",
+          });
+        },
+        onError: (err: any) => {
+          Toast.show({
+            type: "error",
+            text1: "Add failed",
+            text2: err?.message ?? "Something went wrong.",
+          });
+        },
+      },
+    );
+  };
+
+  const handleUpdateAvailable = (data: AvailableDraftDayType) => {
+    setUpdatingId(data.id);
+    updateAvailable.mutate(
+      {
+        id: data.id,
+        userId: guide?.id,
+        startDate: data.startDate || undefined,
+        endDate: data.endDate || undefined,
+        status: data.status || undefined,
+        remark: data.remark,
+        availableTimes: data.availableTimes || [],
+      },
+      {
+        onSuccess: async (data) => {
+          Toast.show({
+            type: "success",
+            text1: "Success",
+            text2: "Update day.",
+          });
+        },
+        onError: (err: any) => {
+          Toast.show({
+            type: "error",
+            text1: "Add failed",
+            text2: err?.message ?? "Something went wrong.",
+          });
+        },
+        onSettled: () => setUpdatingId(null),
+      },
+    );
+  };
+
+  const handleDeleteAvailable = (id: string) => {
+    setDeletingId(id);
+    deleteAvailable.mutate(id, {
+      onSuccess: async () => {
+        Toast.show({
+          type: "success",
+          text1: "Success",
+          text2: "Delete day.",
+        });
+      },
+      onError: (err: any) => {
+        Toast.show({
+          type: "error",
+          text1: "Delete failed",
+          text2: err?.message ?? "Something went wrong.",
+        });
+      },
+      onSettled: () => setDeletingId(null),
+    });
+  };
+
+  return (
+    <>
+      <ImageBackground
+        source={require("../../../assets/images/pattern-background.png")}
+        resizeMode="cover"
+        className="flex-1"
+      >
+        <View className="absolute inset-0 bg-white/80 backdrop-blur-md" />
+
+        <FlatList
+          data={availableDays || []}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <AvailableDayItem
+              key={item.id}
+              item={item as AvailableDraftDayType}
+              onUpdateDay={handleUpdateAvailable}
+              onDeleteDay={handleDeleteAvailable}
+              isUpdatingDay={
+                updatingId === item.id && updateAvailable.isPending
+              }
+              isDeletingDay={
+                deletingId === item.id && deleteAvailable.isPending
+              }
+            />
+          )}
+          ListHeaderComponent={
+            <>
+              <BackButton title={guide?.username || "Unknown"} />
+              <SwitchButtonView
+                activeView={activeView}
+                setActiveView={setActiveView}
+              />
+              {activeView === "calendar" ? (
+                <GlassCalendar />
+              ) : (
+                <SetupForm
+                  startDate={startDate}
+                  endDate={endDate}
+                  remark={remark}
+                  status={status}
+                  setStatus={setStatus}
+                  setStartDate={setStartDate}
+                  setEndDate={setEndDate}
+                  setRemark={setRemark}
+                  handleAddAvailable={handleAddAvailable}
+                  isAddingDay={available.isPending}
+                />
+              )}
+              <Text className="text-lg font-bold mt-2 mx-2">
+                Available Days
+              </Text>
+            </>
+          }
+          contentContainerStyle={{ padding: 0 }}
+        />
+      </ImageBackground>
+    </>
+  );
+}

@@ -8,6 +8,16 @@ export type AvailableDayType = {
   availableTimes?: AvailableTimeType[];
 };
 
+export type AvailableDraftDayType = {
+  id: string;
+  userId?: string;
+  startDate?: string;
+  endDate?: string;
+  remark?: string;
+  status?: string;
+  availableTimes?: AvailableDraftTimeType[];
+};
+
 export type AvailableTimeType = {
   id: string;
   availableDayId: string;
@@ -15,5 +25,14 @@ export type AvailableTimeType = {
   endTime: string;
   remark: string;
   status: string;
-  createdAt: string;
+};
+
+export type AvailableDraftTimeType = {
+  index: string;
+  id?: string | null;
+  availableDayId: string;
+  startTime: string;
+  endTime: string;
+  remark: string;
+  status: string;
 };

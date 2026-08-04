@@ -38,7 +38,7 @@ export default function GlassCalendar() {
     <ImageBackground
       source={require("../assets/images/calendar-image.jpg")}
       resizeMode="cover"
-      className=" border-gray-200"
+      className=" border-gray-200 mx-4 rounded-3xl overflow-hidden mt-4"
       onLoadEnd={handleLoadEnd}
     >
       {!loaded && (

@@ -14,7 +14,7 @@ export default function Guides() {
       <View className="absolute inset-0 bg-white/95" />
       <FlatList
         data={guides || []}
-        className="h-full w-full m-6"
+        className="h-full w-full mt-4"
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <Link
@@ -24,8 +24,9 @@ export default function Guides() {
             }}
             asChild
           >
-            <Pressable className="bg-white p-4 mb-4 rounded-2xl">
-              <Text className="font-bold text-lg">{item.guideName}</Text>
+            <Pressable className="bg-gray-100 p-4 mx-4 mb-4 rounded-2xl">
+              <Text className="font-bold text-lg">{item.fullName}</Text>
+              <Text className="text-gray-400 text-lg">@{item.username}</Text>
             </Pressable>
           </Link>
         )}

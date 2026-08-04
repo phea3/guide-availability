@@ -1,5 +1,5 @@
 import { getServerUri } from "@/lib/dev";
-import { GuideType } from "@/types/guide";
+import { UserType } from "@/types/user";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
@@ -11,7 +11,7 @@ const fetchData = async (params?: Record<string, any>) => {
     params,
     timeout: 60000,
   }).then((res) => res.data);
-  const data: GuideType[] = res?.data;
+  const data: UserType[] = res?.data;
   return data;
 };
 
