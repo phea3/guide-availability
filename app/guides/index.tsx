@@ -9,12 +9,13 @@ export default function Guides() {
     <ImageBackground
       source={require("../../assets/images/pattern-background.png")}
       resizeMode="cover"
-      className="flex-1 justify-center align-middle border-t border-gray-200"
+      className="flex-1 border-t border-gray-200"
     >
-      <View className="absolute inset-0 bg-white/95" />
+      <View className="absolute inset-0 bg-white/95 backdrop-blur-md" />
+
       <FlatList
+        className="mt-4"
         data={guides || []}
-        className="h-full w-full mt-4"
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <Link
@@ -24,7 +25,7 @@ export default function Guides() {
             }}
             asChild
           >
-            <Pressable className="bg-gray-100 p-4 mx-4 mb-4 rounded-2xl">
+            <Pressable className="bg-white/80 backdrop-blur-md rounded-2xl p-4 mx-6 mb-4 border border-gray-300">
               <Text className="font-bold text-lg">{item.fullName}</Text>
               <Text className="text-gray-400 text-lg">@{item.username}</Text>
             </Pressable>

@@ -18,4 +18,5 @@ export type UserType = {
   lastResetPasswordAt?: string;
   lastLoginAt?: string;
   createdAt?: string;
+  clerkUserId?: string;
 };

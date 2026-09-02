@@ -28,7 +28,7 @@ export default function SetupForm({
   isAddingDay?: boolean;
 }) {
   return (
-    <View className="rounded-3xl bg-white/80 backdrop-blur-md p-6 mt-2 mx-2 shadow-md">
+    <View className="rounded-3xl bg-white/80 backdrop-blur-md p-6 mt-4 mx-4 border border-gray-300">
       <Text className="text-lg font-bold mb-1">Setup Available Day</Text>
 
       {/* Date pickers */}

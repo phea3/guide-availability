@@ -8,7 +8,9 @@ import { useGetAvailableDays } from "@/hook/use-available-days";
 import { useDeleteAvailableDay } from "@/hook/use-delete-available-day";
 import { useGetGuideById } from "@/hook/use-guide-id";
 import { useUpdateAvailableDay } from "@/hook/use-update-available-day";
+import { isYourProfile } from "@/lib/dev";
 import { AvailableDraftDayType } from "@/types/availability";
+import { useAuth } from "@clerk/expo";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { FlatList, ImageBackground, Text, View } from "react-native";
@@ -18,6 +20,7 @@ import SetupForm from "./setup-form";
 import SwitchButtonView from "./switch-button-view";
 
 export default function MainGuideDetail() {
+  const { userId } = useAuth();
   const available = useAddAvailableDay();
   const updateAvailable = useUpdateAvailableDay();
   const deleteAvailable = useDeleteAvailableDay();
@@ -133,6 +136,11 @@ export default function MainGuideDetail() {
     });
   };
 
+  const isProfileOwner = isYourProfile({
+    userId,
+    guideUserId: guide?.clerkUserId,
+  });
+
   return (
     <>
       <ImageBackground
@@ -140,10 +148,10 @@ export default function MainGuideDetail() {
         resizeMode="cover"
         className="flex-1"
       >
-        <View className="absolute inset-0 bg-white/80 backdrop-blur-md" />
+        <View className="absolute inset-0 bg-white/95 backdrop-blur-md" />
 
         <FlatList
-          data={availableDays || []}
+          data={isProfileOwner ? availableDays : []}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <AvailableDayItem
@@ -152,23 +160,28 @@ export default function MainGuideDetail() {
               onUpdateDay={handleUpdateAvailable}
               onDeleteDay={handleDeleteAvailable}
               isUpdatingDay={
-                updatingId === item.id && updateAvailable.isPending
+                isProfileOwner &&
+                updatingId === item.id &&
+                updateAvailable.isPending
               }
               isDeletingDay={
-                deletingId === item.id && deleteAvailable.isPending
+                isProfileOwner &&
+                deletingId === item.id &&
+                deleteAvailable.isPending
               }
             />
           )}
           ListHeaderComponent={
             <>
               <BackButton title={guide?.username || "Unknown"} />
-              <SwitchButtonView
-                activeView={activeView}
-                setActiveView={setActiveView}
-              />
-              {activeView === "calendar" ? (
-                <GlassCalendar />
-              ) : (
+              {isProfileOwner && (
+                <SwitchButtonView
+                  activeView={activeView}
+                  setActiveView={setActiveView}
+                />
+              )}
+              {activeView === "calendar" && <GlassCalendar />}
+              {isProfileOwner && activeView === "setup" && (
                 <SetupForm
                   startDate={startDate}
                   endDate={endDate}
@@ -182,8 +195,8 @@ export default function MainGuideDetail() {
                   isAddingDay={available.isPending}
                 />
               )}
-              <Text className="text-lg font-bold mt-2 mx-2">
-                Available Days
+              <Text className="text-lg font-bold mt-4 mx-2 mb-3">
+                {isProfileOwner ? "Your Available Days" : null}
               </Text>
             </>
           }

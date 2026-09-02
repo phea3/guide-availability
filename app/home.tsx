@@ -1,5 +1,4 @@
 import { useGetGuide } from "@/hook/use-all-guide";
-import { BlurView } from "expo-blur";
 import { Link, router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -16,21 +15,24 @@ import {
 const heroSlides = [
   {
     id: "1",
-    title: "Discover Angkor Wat",
-    subtitle: "Explore ancient temples with expert guides",
-    photo: "https://picsum.photos/seed/picsum/200/300",
+    title: "Collaborate Seamlessly",
+    subtitle:
+      "Guides and agents manage schedules together with real-time availability calendars.",
+    photo: require("../assets/images/image1.png"),
   },
   {
     id: "2",
-    title: "Phnom Penh",
-    subtitle: "Experience Cambodia’s vibrant capital",
-    photo: "https://picsum.photos/id/237/200/300",
+    title: "Smart Scheduling Interface",
+    subtitle:
+      "Easily view, edit, and confirm bookings with a clean, intuitive dashboard for both sides.",
+    photo: require("../assets/images/image2.png"),
   },
   {
     id: "3",
-    title: "Battambang",
-    subtitle: "Rice fields and cultural heritage",
-    photo: "https://picsum.photos/200/300?grayscale",
+    title: "Effortless Time Management",
+    subtitle:
+      "Organize tours, set appointments, and track availability — all in one streamlined app.",
+    photo: require("../assets/images/image3.png"),
   },
 ];
 
@@ -105,7 +107,7 @@ export default function Home() {
       resizeMode="cover"
       className="flex-1 justify-center align-middle "
     >
-      <View className="absolute inset-0 bg-white/95" />
+      <View className="absolute inset-0 bg-white/95 backdrop-blur-md" />
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <Image
@@ -113,20 +115,16 @@ export default function Home() {
           className="w-1/3 h-8 mt-4 object-contain left-6"
         />
         <ImageBackground
-          source={{ uri: slide.photo }}
+          source={slide.photo}
           className="h-56 justify-end items-start p-2 m-6 rounded-2xl overflow-hidden"
         >
           <View className="bg-black/50 p-4 rounded-xl">
-            <Text className="text-3xl font-extrabold text-white">
+            <Text className="text-lg font-extrabold text-white">
               {slide.title}
             </Text>
-            <Text className="text-lg text-gray-200">{slide.subtitle}</Text>
           </View>
         </ImageBackground>
         <View className="p-6">
-          {/* <Text className="text-5xl font-extrabold text-yellow-400 mb-2">
-            Find Your Guide
-          </Text> */}
           <Text className="text-lg text-gray-600 mb-6">
             Explore Cambodia with trusted local guides
           </Text>
@@ -134,7 +132,7 @@ export default function Home() {
           <TextInput
             placeholder="Search guides or cities..."
             placeholderTextColor="#9CA3AF"
-            className="bg-gray-100 text-black p-4 rounded-2xl  mb-2"
+            className="bg-gray-100/80 backdrop-blur-md text-black p-4 rounded-2xl mb-2"
           />
           <Text className="text-gray-400">
             Suggestions: John, Sokha, Siem Reap
@@ -151,21 +149,17 @@ export default function Home() {
             showsHorizontalScrollIndicator={false}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <BlurView
-                intensity={40}
-                tint="light"
-                className="rounded-2xl mr-4 p-6 w-64 bg-white/20 border border-white/30"
-              >
+              <View className="rounded-2xl bg-white/80 backdrop-blur-md p-4 mx-4 mb-6 w-64 border border-gray-300">
                 <Text className="font-bold text-lg ">{item.text}</Text>
-              </BlurView>
+              </View>
             )}
           />
         </View>
 
         <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
-          Top Guides
+          Recently Guides
         </Text>
-        <View className="px-6">
+        <View className="px-4">
           <FlatList
             data={guides}
             horizontal
@@ -181,16 +175,20 @@ export default function Home() {
               >
                 <Pressable className="bg-gray-100 rounded-2xl p-4 w-56 mr-4 ">
                   <Image
-                    source={{ uri: item.profileImage }}
+                    source={
+                      item.imageProfile
+                        ? { uri: item.imageProfile }
+                        : require("../assets/images/profile.jpg")
+                    }
                     className="w-full h-28 rounded-xl mb-2"
                   />
 
                   <Text className="font-bold text-lg text-black">
-                    {item.guideName}
+                    {item.fullName}
                   </Text>
-                  <Text className="text-gray-700">⭐ 10/day</Text>
+                  <Text className="text-gray-700">Status: Available</Text>
                   <Text className="text-gray-500">
-                    Languages: {item.address}
+                    Languages: {"Not specified"}
                   </Text>
                 </Pressable>
               </Link>
@@ -201,25 +199,21 @@ export default function Home() {
         <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
           Explore Cities
         </Text>
-        <View className="px-6">
-          <FlatList
-            data={cities}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View className="bg-gray-100 rounded-2xl p-4 w-64 mr-4">
-                <Text className="font-bold text-lg text-black">
-                  {item.name}
-                </Text>
-                <Text className="text-gray-700">{item.desc}</Text>
-                <Text className="text-gray-500">
-                  {item.weather} | {item.attractions}
-                </Text>
-              </View>
-            )}
-          />
-        </View>
+        <FlatList
+          data={cities}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View className="rounded-2xl bg-white/80 backdrop-blur-md p-4 mx-4 mb-6 border border-gray-300">
+              <Text className="font-bold text-lg text-black">{item.name}</Text>
+              <Text className="text-gray-700">{item.desc}</Text>
+              <Text className="text-gray-500">
+                {item.weather} | {item.attractions}
+              </Text>
+            </View>
+          )}
+        />
         <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
           Quick Actions
         </Text>
@@ -244,7 +238,10 @@ export default function Home() {
           Testimonials
         </Text>
         {testimonials.map((t) => (
-          <View key={t.id} className="bg-gray-100 rounded-2xl  p-4 mx-6 mb-4">
+          <View
+            key={t.id}
+            className="bg-white/80 backdrop-blur-md rounded-2xl p-4 mx-6 mb-4 border border-gray-300"
+          >
             <Text className="text-gray-800 italic">{t.text}</Text>
           </View>
         ))}
@@ -253,7 +250,10 @@ export default function Home() {
           Upcoming Events
         </Text>
         {events.map((e) => (
-          <View key={e.id} className="bg-gray-100 rounded-2xl  p-4 mx-6 mb-4">
+          <View
+            key={e.id}
+            className="bg-white/80 backdrop-blur-md rounded-2xl p-4 mx-6 mb-4 border border-gray-300"
+          >
             <Text className="font-bold text-lg text-black">{e.name}</Text>
             <Text className="text-gray-600">
               {e.date} — {e.location}
