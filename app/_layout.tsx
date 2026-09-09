@@ -17,8 +17,7 @@ if (!publishableKey) {
 export default function RootLayout() {
   const pathname = usePathname();
 
-  const isAuthScreen =
-    pathname === "/" || pathname === "/login" || pathname === "/register";
+  const isAuthScreen = pathname === "/" || pathname === "/register";
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -38,7 +37,7 @@ export default function RootLayout() {
                 }}
               >
                 {/* <Stack.Screen name="index" options={{ animation: "fade" }} /> */}
-                <Stack.Screen name="login" options={{ animation: "fade" }} />
+                {/* <Stack.Screen name="login" options={{ animation: "fade" }} /> */}
                 <Stack.Screen name="register" options={{ animation: "fade" }} />
                 <Stack.Screen name="home" options={{ animation: "fade" }} />
                 <Stack.Screen

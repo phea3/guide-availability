@@ -14,9 +14,10 @@ export default function Index() {
     if (isSignedIn && user) {
       router.replace("/home");
     } else {
-      router.replace("/login");
+      router.replace("/register");
     }
   }, [isLoaded, isSignedIn, user]);
+
   if (!isLoaded) {
     return <LoadingScreen />;
   }

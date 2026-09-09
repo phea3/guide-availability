@@ -42,23 +42,23 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!user) return;
 
-    setForm({
-      fullName: user.fullName || "",
-      username: user.username || "",
-      email: user.email || "",
-      phoneNumber: user.phoneNumber || "",
-      description: user.description || "",
-      status: user.status || "",
-      role: user.role || "",
-    });
+    const timeout = setTimeout(() => {
+      setForm({
+        fullName: user.fullName || "",
+        username: user.username || "",
+        email: user.email || "",
+        phoneNumber: user.phoneNumber || "",
+        description: user.description || "",
+        status: user.status || "",
+        role: user.role || "",
+      });
+    }, 0);
+
+    return () => clearTimeout(timeout);
   }, [user]);
 
   if (!isLoaded || isPending) {
     return <LoadingScreen />;
-  }
-
-  if (!userId || !user) {
-    return null;
   }
 
   const renderEditableRow = ({
@@ -119,7 +119,7 @@ export default function ProfilePage() {
 
       await signOut();
 
-      router.replace("/login");
+      router.replace("/register");
     } catch (error) {
       console.error("Logout error:", error);
 
@@ -150,108 +150,116 @@ export default function ProfilePage() {
             </View>
           </Pressable>
         </View>
-
-        <View className="my-10 w-full">
-          <Image
-            source={require("../../assets/images/profile.jpg")}
-            className="mx-auto h-32 w-32"
-          />
-        </View>
-
-        <View className="flex flex-col gap-4">
-          {!user.isVerified && (
-            <View className="rounded-2xl bg-yellow-100 backdrop-blur-md p-4 border border-gray-300">
-              <Text>Verify now</Text>
-              <Text className="text-lg">
-                {user.username}, you aren&apos;t verified yet
-              </Text>
-            </View>
-          )}
-
-          {user.role === "Guide" && (
-            <View className="rounded-2xl bg-white/80 backdrop-blur-md p-4 border border-gray-300">
-              <Text>Setup</Text>
-
-              <Link
-                href={{
-                  pathname: "/guides/[id]",
-                  params: { id: user.id },
-                }}
-                asChild
-              >
-                <Pressable className="mb-2 mt-2 rounded-2xl bg-gray-100 p-4">
-                  <Text className="text-lg font-bold">Click here</Text>
-                </Pressable>
-              </Link>
-            </View>
-          )}
-
-          {renderEditableRow({
-            title: "Full Name",
-            field: "fullName",
-          })}
-
-          {renderEditableRow({
-            title: "Username",
-            field: "username",
-          })}
-
-          {renderEditableRow({
-            title: "Email",
-            field: "email",
-          })}
-
-          {renderEditableRow({
-            title: "Phone",
-            field: "phoneNumber",
-          })}
-
-          {renderEditableRow({
-            title: "Description",
-            field: "description",
-          })}
-
-          {renderEditableRow({
-            title: "Status",
-            field: "status",
-            options: ["Active", "Inactive"],
-          })}
-
-          {renderEditableRow({
-            title: "Role",
-            field: "role",
-            options: ["Guide", "Agency"],
-          })}
-        </View>
-
-        <Pressable
-          disabled={updateProfile.isPending}
-          onPress={() => {
-            updateProfile.mutate(form, {
-              onSuccess: () => {
-                Toast.show({
-                  type: "success",
-                  text1: "Success",
-                  text2: "Profile updated successfully.",
-                });
-              },
-              onError: (err: any) => {
-                Toast.show({
-                  type: "error",
-                  text1: "Update failed",
-                  text2: err?.message ?? "Something went wrong.",
-                });
-              },
-            });
-          }}
-          className={`mb-32 mt-8 rounded-2xl py-4 ${
-            updateProfile.isPending ? "bg-blue-400" : "bg-blue-600"
-          }`}
-        >
-          <Text className="text-center text-lg font-bold text-white">
-            {updateProfile.isPending ? "Saving..." : "Save Changes"}
+        {!userId || !user ? (
+          <Text className="w-full h-full text-center text-lg">
+            No user data available
           </Text>
-        </Pressable>
+        ) : (
+          <>
+            <View className="my-10 w-full">
+              <Image
+                source={require("../../assets/images/profile.jpg")}
+                className="mx-auto h-32 w-32"
+              />
+            </View>
+
+            <View className="flex flex-col gap-4">
+              {!user?.isVerified && (
+                <View className="rounded-2xl bg-yellow-100 backdrop-blur-md p-4 border border-gray-300">
+                  <Text>Verify now</Text>
+                  <Text className="text-lg">
+                    {user?.username}, you aren&apos;t verified yet. Please
+                    verify your account to access all features.
+                  </Text>
+                </View>
+              )}
+
+              {user?.role === "Guide" && (
+                <View className="rounded-2xl bg-white/80 backdrop-blur-md p-4 border border-gray-300">
+                  <Text>Setup</Text>
+
+                  <Link
+                    href={{
+                      pathname: "/guides/[id]",
+                      params: { id: user.id },
+                    }}
+                    asChild
+                  >
+                    <Pressable className="mb-2 mt-2 rounded-2xl bg-gray-100 p-4">
+                      <Text className="text-lg font-bold">Click here</Text>
+                    </Pressable>
+                  </Link>
+                </View>
+              )}
+
+              {renderEditableRow({
+                title: "Full Name",
+                field: "fullName",
+              })}
+
+              {renderEditableRow({
+                title: "Username",
+                field: "username",
+              })}
+
+              {renderEditableRow({
+                title: "Email",
+                field: "email",
+              })}
+
+              {renderEditableRow({
+                title: "Phone",
+                field: "phoneNumber",
+              })}
+
+              {renderEditableRow({
+                title: "Description",
+                field: "description",
+              })}
+
+              {renderEditableRow({
+                title: "Status",
+                field: "status",
+                options: ["Active", "Inactive"],
+              })}
+
+              {renderEditableRow({
+                title: "Role",
+                field: "role",
+                options: ["Guide", "Agency"],
+              })}
+            </View>
+
+            <Pressable
+              disabled={updateProfile.isPending}
+              onPress={() => {
+                updateProfile.mutate(form, {
+                  onSuccess: () => {
+                    Toast.show({
+                      type: "success",
+                      text1: "Success",
+                      text2: "Profile updated successfully.",
+                    });
+                  },
+                  onError: (err: any) => {
+                    Toast.show({
+                      type: "error",
+                      text1: "Update failed",
+                      text2: err?.message ?? "Something went wrong.",
+                    });
+                  },
+                });
+              }}
+              className={`mb-32 mt-8 rounded-2xl py-4 ${
+                updateProfile.isPending ? "bg-blue-400" : "bg-blue-600"
+              }`}
+            >
+              <Text className="text-center text-lg font-bold text-white">
+                {updateProfile.isPending ? "Saving..." : "Save Changes"}
+              </Text>
+            </Pressable>
+          </>
+        )}
       </ScrollView>
 
       <Modal

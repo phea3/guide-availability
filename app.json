@@ -7,8 +7,8 @@
     "icon": "./assets/images/icon.png",
     "scheme": "guideavailability",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
+      "bundleIdentifier": "com.guideavailability.app",
       "supportsTablet": true,
       "config": {
         "usesNonExemptEncryption": false
@@ -21,7 +21,6 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "web": {
@@ -51,7 +50,10 @@
       ],
       "expo-font",
       "@react-native-community/datetimepicker",
-      "@clerk/expo"
+      "@clerk/expo",
+      "expo-image",
+      "expo-status-bar",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,

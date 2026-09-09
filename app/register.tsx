@@ -1,6 +1,10 @@
 import BackButtonDefault from "@/components/back-button-default";
 import { useRegister } from "@/hook/use-register";
-import { useAuth, useSignUp } from "@clerk/expo";
+import { useAuth } from "@clerk/expo";
+import { useSignInWithApple } from "@clerk/expo/apple";
+import { useSignInWithGoogle } from "@clerk/expo/google";
+import { useHostedAuth } from "@clerk/expo/hosted-auth";
+import Constants from "expo-constants";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -14,186 +18,220 @@ import {
 
 export default function Register() {
   const { isLoaded, isSignedIn, getToken } = useAuth();
-  const { signUp } = useSignUp();
+
   const register = useRegister();
 
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"Guide" | "Agency">("Guide");
+  // Native Google Sign-In
+  const { startGoogleAuthenticationFlow } = useSignInWithGoogle();
 
-  const [code, setCode] = useState("");
-  const [isVerifying, setIsVerifying] = useState(false);
+  // Expo Go browser/hosted authentication
+  const { startHostedAuth } = useHostedAuth();
+
+  // Apple native authentication
+  const { startAppleAuthenticationFlow } = useSignInWithApple();
+
+  const [fullName, setFullName] = useState("");
+  const [role, setRole] = useState<"Guide" | "Agency">("Guide");
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState("");
+  const [isRegistering, setIsRegistering] = useState(false);
 
-  const pendingEmail = signUp?.emailAddress || email;
-
-  const registerWithRetry = async (token: string) => {
-    try {
-      return await register.mutateAsync({
-        token,
-        data: {
-          fullName: fullName.trim(),
-          email: email.trim().toLowerCase(),
-          role,
-        },
-      });
-    } catch (error: any) {
-      const message = error?.response?.data?.message || error?.message || "";
-
-      if (
-        !message.includes("not before") &&
-        !message.includes("token-not-active-yet")
-      ) {
-        throw error;
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      const freshToken = await getToken();
-
-      if (!freshToken) {
-        throw error;
-      }
-
-      return await register.mutateAsync({
-        token: freshToken,
-        data: {
-          fullName: fullName.trim(),
-          email: email.trim().toLowerCase(),
-          role,
-        },
-      });
-    }
-  };
-
-  const handleRegister = async () => {
-    if (!isLoaded) return;
-
-    setError("");
-
-    if (!fullName.trim()) {
-      setError("Full name is required");
-      return;
-    }
-
-    if (!email.trim()) {
-      setError("Email is required");
-      return;
-    }
-
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters");
-      return;
-    }
-
-    setIsPending(true);
-
-    try {
-      const names = fullName.trim().split(/\s+/);
-
-      const firstName = names[0];
-      const lastName = names.slice(1).join(" ") || undefined;
-
-      const { error: signUpError } = await signUp.password({
-        emailAddress: email.trim().toLowerCase(),
-        password,
-        firstName,
-        lastName,
-        unsafeMetadata: {
-          fullName,
-          role,
-        },
-      });
-
-      if (signUpError) {
-        setError(
-          signUpError.message || "Registration failed. Please try again.",
-        );
-        return;
-      }
-
-      const { error: sendError } = await signUp.verifications.sendEmailCode();
-
-      if (sendError) {
-        setError(sendError.message || "Failed to send verification code.");
-        return;
-      }
-
-      setIsVerifying(true);
-    } catch (err: any) {
-      setError(err?.message || "Registration failed. Please try again.");
-    } finally {
-      setIsPending(false);
-    }
-  };
-
-  const handleVerify = async () => {
-    if (!isLoaded) return;
-
-    setError("");
-
-    if (!code.trim()) {
-      setError("Verification code is required");
-      return;
-    }
-
-    setIsPending(true);
-
-    try {
-      // Verify email
-      const { error: verifyError } = await signUp.verifications.verifyEmailCode(
-        {
-          code: code.trim(),
-        },
-      );
-
-      if (verifyError) {
-        setError(verifyError.message || "Invalid verification code.");
-        return;
-      }
-
-      // Create Clerk session
-      const { error: finalizeError } = await signUp.finalize();
-
-      if (finalizeError) {
-        setError(finalizeError.message || "Failed to complete registration.");
-        return;
-      }
-
-      // Get Clerk session token
-      const token = await getToken();
-
-      if (!token) {
-        setError("Unable to authenticate with Clerk.");
-        return;
-      }
-
-      const data = await registerWithRetry(token);
-
-      if (!data.success) {
-        setError("Failed to create user.");
-        return;
-      }
-
-      router.replace("/home");
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Verification failed. Please try again.",
-      );
-    } finally {
-      setIsPending(false);
-    }
-  };
+  /**
+   * Expo Go does not contain Clerk's native Google Sign-In module.
+   *
+   * Expo Go:
+   *   -> Hosted/browser OAuth
+   *
+   * Development build:
+   *   -> Native Google Sign-In
+   */
+  const isExpoGo = Constants.appOwnership === "expo";
 
   useEffect(() => {
-    if (isLoaded && isSignedIn) {
-      // Clerk session is now active
+    if (isLoaded && isSignedIn && !isRegistering) {
+      router.replace("/home");
     }
-  }, [isLoaded, isSignedIn]);
+  }, [isLoaded, isSignedIn, isRegistering]);
+
+  /**
+   * Register the authenticated Clerk user with your backend.
+   */
+  const registerUser = async () => {
+    const token = await getToken({
+      skipCache: true,
+    });
+
+    if (!token) {
+      throw new Error("Unable to get authentication token.");
+    }
+
+    await register.mutateAsync({
+      data: {
+        fullName: fullName.trim(),
+        role,
+      },
+      token,
+    });
+  };
+
+  /**
+   * Google registration
+   *
+   * Expo Go:
+   *   Uses Clerk Hosted Auth / browser.
+   *
+   * Development build:
+   *   Uses native Google Sign-In.
+   */
+  const handleGoogleRegister = async () => {
+    if (!isLoaded) return;
+
+    setIsRegistering(true);
+    setError("");
+    setIsPending(true);
+
+    try {
+      if (isExpoGo) {
+        /**
+         * Expo Go cannot use:
+         *
+         * startGoogleAuthenticationFlow()
+         *
+         * because ClerkGoogleSignIn is a native module.
+         *
+         * Hosted auth opens Google in the browser and
+         * redirects back into the Expo app.
+         */
+        await startHostedAuth();
+
+        /**
+         * Hosted authentication handles the session.
+         *
+         * Wait a little for Clerk to update the session,
+         * then retrieve the token.
+         */
+        let token: string | null = null;
+
+        for (let attempt = 0; attempt < 5; attempt++) {
+          await new Promise((resolve) => setTimeout(resolve, 500));
+
+          token = await getToken({
+            skipCache: true,
+          });
+
+          if (token) break;
+        }
+
+        if (!token) {
+          throw new Error(
+            "Authentication succeeded, but no Clerk session token was available.",
+          );
+        }
+
+        // await register.mutateAsync({
+        //   data: {
+        //     fullName: fullName.trim(),
+        //     role,
+        //   },
+        //   token,
+        // });
+
+        setIsRegistering(false);
+        router.replace("/home");
+
+        return;
+      }
+
+      /**
+       * Development build / native app
+       */
+      const { createdSessionId, setActive } =
+        await startGoogleAuthenticationFlow({
+          unsafeMetadata: {
+            fullName: fullName.trim(),
+            role,
+          },
+        });
+
+      if (!createdSessionId || !setActive) {
+        throw new Error("Google authentication did not create a session.");
+      }
+
+      await setActive({
+        session: createdSessionId,
+      });
+
+      // await registerUser();
+
+      setIsRegistering(false);
+      router.replace("/home");
+    } catch (err: any) {
+      setIsRegistering(false);
+
+      if (
+        err?.code === "SIGN_IN_CANCELLED" ||
+        err?.code === "-5" ||
+        err?.code === "ERR_REQUEST_CANCELED"
+      ) {
+        return;
+      }
+
+      console.error("Google authentication error:", err);
+
+      setError(err?.message || "Google registration failed. Please try again.");
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  /**
+   * Apple registration
+   *
+   * Apple is only available on iOS.
+   * This remains native, so use a development build for it.
+   */
+  const handleAppleRegister = async () => {
+    if (!isLoaded) return;
+
+    setIsRegistering(true);
+    setError("");
+    setIsPending(true);
+
+    try {
+      const { createdSessionId, setActive } =
+        await startAppleAuthenticationFlow({
+          unsafeMetadata: {
+            fullName: fullName.trim(),
+            role,
+          },
+        });
+
+      if (!createdSessionId || !setActive) {
+        throw new Error("Apple authentication did not create a session.");
+      }
+
+      await setActive({
+        session: createdSessionId,
+      });
+
+      // await registerUser();
+
+      setIsRegistering(false);
+      router.replace("/home");
+    } catch (err: any) {
+      setIsRegistering(false);
+
+      if (err?.code === "ERR_REQUEST_CANCELED") {
+        return;
+      }
+
+      console.error("Apple authentication error:", err);
+
+      setError(err?.message || "Apple registration failed. Please try again.");
+    } finally {
+      setIsPending(false);
+    }
+  };
 
   if (!isLoaded) {
     return null;
@@ -208,154 +246,92 @@ export default function Register() {
         <BackButtonDefault />
 
         <Text className="mb-6 text-center text-3xl font-bold">
-          {isVerifying ? "Verify Email" : "Register"}
+          Create Account
         </Text>
 
-        {!isVerifying ? (
-          <>
-            <TextInput
-              placeholder="Full Name"
-              value={fullName}
-              onChangeText={setFullName}
-              autoCapitalize="words"
-              className="mb-4 rounded-xl bg-white p-4"
-            />
+        {/* Full Name */}
+        <TextInput
+          placeholder="Full Name"
+          value={fullName}
+          onChangeText={setFullName}
+          autoCapitalize="words"
+          editable={!isPending}
+          className="mb-4 rounded-xl bg-white p-4"
+        />
 
-            <TextInput
-              placeholder="Email"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              autoComplete="email"
-              className="mb-4 rounded-xl bg-white p-4"
-            />
-
-            <TextInput
-              placeholder="Password"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              autoCapitalize="none"
-              autoComplete="new-password"
-              className="mb-4 rounded-xl bg-white p-4"
-            />
-
-            <View className="mb-4 flex-row gap-3">
-              <Pressable
-                onPress={() => setRole("Guide")}
-                className={`flex-1 rounded-xl p-4 ${
-                  role === "Guide" ? "bg-black" : "bg-white"
-                }`}
-              >
-                <Text
-                  className={`text-center font-semibold ${
-                    role === "Guide" ? "text-white" : "text-black"
-                  }`}
-                >
-                  Guide
-                </Text>
-              </Pressable>
-
-              <Pressable
-                onPress={() => setRole("Agency")}
-                className={`flex-1 rounded-xl p-4 ${
-                  role === "Agency" ? "bg-black" : "bg-white"
-                }`}
-              >
-                <Text
-                  className={`text-center font-semibold ${
-                    role === "Agency" ? "text-white" : "text-black"
-                  }`}
-                >
-                  Agency
-                </Text>
-              </Pressable>
-            </View>
-
-            {!!error && <Text className="mb-4 text-red-500">{error}</Text>}
-
-            <Pressable
-              onPress={handleRegister}
-              disabled={isPending}
-              className={`rounded-xl bg-black py-4 ${
-                isPending ? "opacity-50" : ""
+        {/* Role */}
+        <View className="mb-4 flex-row gap-3">
+          <Pressable
+            onPress={() => setRole("Guide")}
+            disabled={isPending}
+            className={`flex-1 rounded-xl p-4 ${
+              role === "Guide" ? "bg-black" : "bg-white"
+            }`}
+          >
+            <Text
+              className={`text-center font-semibold ${
+                role === "Guide" ? "text-white" : "text-black"
               }`}
             >
-              <Text className="text-center font-semibold text-white">
-                {isPending ? "Creating account..." : "Register"}
-              </Text>
-            </Pressable>
-          </>
-        ) : isSignedIn ? (
-          <View className="flex items-center justify-center bg-gray-100 p-6">
-            <Text className="mb-4 text-2xl font-bold">
-              You are already signed in
+              Guide
             </Text>
+          </Pressable>
 
-            <Pressable
-              onPress={() => router.replace("/")}
-              className="w-full rounded-xl bg-black py-4"
-            >
-              <Text className="text-center font-semibold text-white">
-                Go to Home
-              </Text>
-            </Pressable>
-          </View>
-        ) : (
-          <>
-            <Text className="mb-4 text-center text-gray-600">
-              We sent a verification code to{"\n"}
-              <Text className="font-semibold text-black">{pendingEmail}</Text>
-            </Text>
-
-            <TextInput
-              placeholder="Enter verification code"
-              value={code}
-              onChangeText={setCode}
-              keyboardType="number-pad"
-              autoCapitalize="none"
-              className="mb-4 rounded-xl bg-white p-4 text-center text-lg"
-            />
-
-            {!!error && (
-              <Text className="mb-4 text-center text-red-500">{error}</Text>
-            )}
-
-            <Pressable
-              onPress={handleVerify}
-              disabled={isPending}
-              className={`rounded-xl bg-black py-4 ${
-                isPending ? "opacity-50" : ""
+          <Pressable
+            onPress={() => setRole("Agency")}
+            disabled={isPending}
+            className={`flex-1 rounded-xl p-4 ${
+              role === "Agency" ? "bg-black" : "bg-white"
+            }`}
+          >
+            <Text
+              className={`text-center font-semibold ${
+                role === "Agency" ? "text-white" : "text-black"
               }`}
             >
-              <Text className="text-center font-semibold text-white">
-                {isPending ? "Verifying..." : "Verify Email"}
-              </Text>
-            </Pressable>
+              Agency
+            </Text>
+          </Pressable>
+        </View>
 
-            <Pressable
-              onPress={async () => {
-                if (!isLoaded) return;
+        {!!error && <Text className="mb-4 text-red-500">{error}</Text>}
 
-                setError("");
+        {/* Google */}
+        <Pressable
+          onPress={handleGoogleRegister}
+          disabled={isPending}
+          className={`rounded-xl border border-gray-300 bg-white py-4 ${
+            isPending ? "opacity-50" : ""
+          }`}
+        >
+          <Text className="text-center font-semibold text-black">
+            Continue with Google
+          </Text>
+        </Pressable>
 
-                const { error } = await signUp.verifications.sendEmailCode();
+        <View className="my-5 flex-row items-center">
+          <View className="h-px flex-1 bg-gray-300" />
 
-                if (error) {
-                  setError(error.message || "Failed to resend code.");
-                }
-              }}
-              className="mt-4 py-3"
-            >
-              <Text className="text-center font-semibold">
-                Resend verification code
-              </Text>
-            </Pressable>
-          </>
+          <Text className="mx-4 text-gray-500">OR</Text>
+
+          <View className="h-px flex-1 bg-gray-300" />
+        </View>
+
+        {/* Apple */}
+        {Platform.OS === "ios" && (
+          <Pressable
+            onPress={handleAppleRegister}
+            disabled={isPending}
+            className={`rounded-xl bg-black py-4 ${
+              isPending ? "opacity-50" : ""
+            }`}
+          >
+            <Text className="text-center font-semibold text-white">
+              Continue with Apple
+            </Text>
+          </Pressable>
         )}
 
-        {/* Required for Clerk CAPTCHA on Expo Web */}
         <View nativeID="clerk-captcha" />
       </View>
     </KeyboardAvoidingView>
