@@ -1,36 +1,23 @@
-import { Link } from "expo-router";
-import { FlatList, Pressable, Text, View } from "react-native";
-
-const bookings = [
-  { id: "1", name: "John", available: true },
-  { id: "2", name: "Sokha", available: false },
-];
+import { Ionicons } from "@expo/vector-icons";
+import { Text, View } from "react-native";
 
 export default function Bookings() {
   return (
-    <View className="flex-1 bg-gray-100 p-6">
-      <FlatList
-        data={bookings}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <Link
-            href={{
-              pathname: "/guides/[id]",
-              params: { id: item.id },
-            }}
-            asChild
-          >
-            <Pressable className="bg-white p-4 mb-4 rounded-2xl">
-              <Text className="font-bold text-lg">{item.name}</Text>
-              <Text
-                className={item.available ? "text-green-600" : "text-red-600"}
-              >
-                {item.available ? "Available" : "Not Available"}
-              </Text>
-            </Pressable>
-          </Link>
-        )}
-      />
+    <View className="flex-1 items-center justify-center bg-gray-100 px-6">
+      <View className="h-20 w-20 items-center justify-center rounded-full bg-white">
+        <Ionicons name="calendar-outline" size={40} color="#111827" />
+      </View>
+
+      <Text className="mt-6 text-2xl font-bold text-gray-900">Bookings</Text>
+
+      <Text className="mt-2 max-w-sm text-center text-base text-gray-500">
+        We&apos;re working on this feature. Soon you&apos;ll be able to save and
+        easily access your favorite guides.
+      </Text>
+
+      <View className="mt-6 rounded-full bg-black px-5 py-2.5">
+        <Text className="font-medium text-white">Coming Soon</Text>
+      </View>
     </View>
   );
 }

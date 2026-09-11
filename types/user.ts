@@ -6,7 +6,7 @@ export type UserType = {
   phoneNumber?: string;
   verifiedEmail?: string;
   hashPassword?: string;
-  imageProfile?: string;
+  imageUrl?: string;
   role?: string;
   status?: string;
   isRegisterUser?: string;

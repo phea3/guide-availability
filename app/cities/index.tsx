@@ -1,5 +1,5 @@
 import { Link } from "expo-router";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { FlatList, ImageBackground, Text, View } from "react-native";
 
 const cities = [
   {
@@ -22,10 +22,27 @@ const cities = [
 
 export default function Cities() {
   return (
-    <View className="flex-1 bg-gray-100 p-6">
+    <ImageBackground
+      source={require("../../assets/images/pattern-background.png")}
+      resizeMode="cover"
+      className="flex-1 justify-center align-middle "
+    >
+      <View className="absolute inset-0 bg-white/95 backdrop-blur-md" />
+
       <FlatList
         data={cities}
         keyExtractor={(item) => item.id}
+        ListHeaderComponent={
+          <View className="px-5 pb-5 pt-8">
+            <Text className="text-3xl font-bold text-gray-900">
+              Explore Cities
+            </Text>
+
+            <Text className="mt-2 text-base text-gray-500">
+              Discover destinations and find local guides.
+            </Text>
+          </View>
+        }
         renderItem={({ item }) => (
           <Link
             href={{
@@ -34,13 +51,16 @@ export default function Cities() {
             }}
             asChild
           >
-            <Pressable className="bg-white p-4 mb-4 rounded-2xl">
-              <Text className="font-bold text-lg">{item.name}</Text>
-              <Text className={item.name}>{item.name}</Text>
-            </Pressable>
+            <View className="rounded-2xl bg-white/80 backdrop-blur-md p-4 mx-4 mb-6 border border-gray-300">
+              <Text className="font-bold text-lg text-black">{item.name}</Text>
+              <Text className="text-gray-700">{item.desc}</Text>
+              <Text className="text-gray-500">
+                {item.weather} | {item.attractions}
+              </Text>
+            </View>
           </Link>
         )}
       />
-    </View>
+    </ImageBackground>
   );
 }

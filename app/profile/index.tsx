@@ -1,4 +1,4 @@
-import { LoadingScreen } from "@/components/loading-screen";
+import AuthenticationModal from "@/components/authentication";
 import { useProfileDetail } from "@/hook/use-profile-detail";
 import { useGetUserById } from "@/hook/use-user-id";
 import { useAuth } from "@clerk/expo";
@@ -19,9 +19,7 @@ import {
 import Toast from "react-native-toast-message";
 
 export default function ProfilePage() {
-  const { isLoaded, userId, signOut } = useAuth();
-
-  const updateProfile = useProfileDetail();
+  const { userId, signOut } = useAuth();
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
@@ -37,7 +35,9 @@ export default function ProfilePage() {
 
   const [editing, setEditing] = useState<string | null>(null);
 
-  const { data: user, isPending } = useGetUserById(userId || "");
+  const { data: user } = useGetUserById(userId || "");
+
+  const updateProfile = useProfileDetail();
 
   useEffect(() => {
     if (!user) return;
@@ -57,9 +57,9 @@ export default function ProfilePage() {
     return () => clearTimeout(timeout);
   }, [user]);
 
-  if (!isLoaded || isPending) {
-    return <LoadingScreen />;
-  }
+  // if (!isLoaded || isPending) {
+  //   return <LoadingScreen />;
+  // }
 
   const renderEditableRow = ({
     title,
@@ -151,20 +151,38 @@ export default function ProfilePage() {
           </Pressable>
         </View>
         {!userId || !user ? (
-          <Text className="w-full h-full text-center text-lg">
-            No user data available
-          </Text>
+          <View className="rounded-2xl bg-white/80 backdrop-blur-md p-4 mx-2 mt-6 mb-6 border border-gray-300">
+            <Text className="mb-2 text-xl font-bold text-gray-900">
+              Account Profile
+            </Text>
+
+            <Text className="mb-6 text-gray-600">
+              There is no user data available. Please log in or register to view
+              your profile.
+            </Text>
+          </View>
         ) : (
           <>
-            <View className="my-10 w-full">
-              <Image
-                source={require("../../assets/images/profile.jpg")}
-                className="mx-auto h-32 w-32"
-              />
+            <View className="my-10 w-full items-center">
+              <View className="h-36 w-36 overflow-hidden rounded-full border-4 border-white bg-gray-100 shadow-lg">
+                <Image
+                  source={
+                    user?.imageUrl
+                      ? { uri: user.imageUrl }
+                      : require("../../assets/images/profile.jpg")
+                  }
+                  className="h-full w-full"
+                  resizeMode="cover"
+                />
+              </View>
+
+              <Text className="mt-4 text-xl font-bold text-gray-900">
+                {user?.fullName || "Your Profile"}
+              </Text>
             </View>
 
             <View className="flex flex-col gap-4">
-              {!user?.isVerified && (
+              {/* {!user?.isVerified && (
                 <View className="rounded-2xl bg-yellow-100 backdrop-blur-md p-4 border border-gray-300">
                   <Text>Verify now</Text>
                   <Text className="text-lg">
@@ -172,11 +190,29 @@ export default function ProfilePage() {
                     verify your account to access all features.
                   </Text>
                 </View>
-              )}
+              )} */}
 
               {user?.role === "Guide" && (
-                <View className="rounded-2xl bg-white/80 backdrop-blur-md p-4 border border-gray-300">
-                  <Text>Setup</Text>
+                <View className="mx-4 mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                  <View className="flex-row items-center">
+                    <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-amber-100">
+                      <Ionicons
+                        name="person-outline"
+                        size={22}
+                        color="#D97706"
+                      />
+                    </View>
+
+                    <View className="flex-1">
+                      <Text className="text-base font-bold text-gray-900">
+                        Complete your guide availability profile
+                      </Text>
+
+                      <Text className="mt-1 text-sm text-gray-600">
+                        Add your information so agencies can discover you.
+                      </Text>
+                    </View>
+                  </View>
 
                   <Link
                     href={{
@@ -185,12 +221,31 @@ export default function ProfilePage() {
                     }}
                     asChild
                   >
-                    <Pressable className="mb-2 mt-2 rounded-2xl bg-gray-100 p-4">
-                      <Text className="text-lg font-bold">Click here</Text>
+                    <Pressable className="mt-4 flex-row items-center justify-center rounded-xl bg-amber-500 px-4 py-3">
+                      <Text className="font-bold text-white">
+                        Complete Profile
+                      </Text>
+                      <Ionicons
+                        name="arrow-forward"
+                        size={18}
+                        color="white"
+                        style={{ marginLeft: 8 }}
+                      />
                     </Pressable>
                   </Link>
                 </View>
               )}
+
+              <View className="py-4">
+                <Text className="text-lg font-bold">
+                  Check & Update Informations
+                </Text>
+
+                <Text className="">
+                  Tap on a field to edit it. Once done, click &rdquo;Save
+                  Changes&rdquo; to update your profile.
+                </Text>
+              </View>
 
               {renderEditableRow({
                 title: "Full Name",
@@ -233,25 +288,31 @@ export default function ProfilePage() {
             <Pressable
               disabled={updateProfile.isPending}
               onPress={() => {
-                updateProfile.mutate(form, {
-                  onSuccess: () => {
-                    Toast.show({
-                      type: "success",
-                      text1: "Success",
-                      text2: "Profile updated successfully.",
-                    });
+                updateProfile.mutate(
+                  {
+                    ...form,
+                    id: user?.id || "",
                   },
-                  onError: (err: any) => {
-                    Toast.show({
-                      type: "error",
-                      text1: "Update failed",
-                      text2: err?.message ?? "Something went wrong.",
-                    });
+                  {
+                    onSuccess: () => {
+                      Toast.show({
+                        type: "success",
+                        text1: "Success",
+                        text2: "Profile updated successfully.",
+                      });
+                    },
+                    onError: (err: any) => {
+                      Toast.show({
+                        type: "error",
+                        text1: "Update failed",
+                        text2: err?.message ?? "Something went wrong.",
+                      });
+                    },
                   },
-                });
+                );
               }}
               className={`mb-32 mt-8 rounded-2xl py-4 ${
-                updateProfile.isPending ? "bg-blue-400" : "bg-blue-600"
+                updateProfile.isPending ? "bg-green-400" : "bg-yellow-400"
               }`}
             >
               <Text className="text-center text-lg font-bold text-white">
@@ -296,6 +357,7 @@ export default function ProfilePage() {
           </View>
         </View>
       </Modal>
+      <AuthenticationModal />
     </ImageBackground>
   );
 }

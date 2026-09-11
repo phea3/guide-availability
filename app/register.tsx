@@ -128,13 +128,7 @@ export default function Register() {
           );
         }
 
-        // await register.mutateAsync({
-        //   data: {
-        //     fullName: fullName.trim(),
-        //     role,
-        //   },
-        //   token,
-        // });
+        await registerUser();
 
         setIsRegistering(false);
         router.replace("/home");
@@ -161,7 +155,7 @@ export default function Register() {
         session: createdSessionId,
       });
 
-      // await registerUser();
+      await registerUser();
 
       setIsRegistering(false);
       router.replace("/home");

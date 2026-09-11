@@ -17,4 +17,5 @@ export type ProfileDetailType = {
   description: string;
   role: string;
   status: string;
+  id: string;
 };

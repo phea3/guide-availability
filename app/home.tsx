@@ -176,8 +176,8 @@ export default function Home() {
                 <Pressable className="bg-gray-100 rounded-2xl p-4 w-56 mr-4 ">
                   <Image
                     source={
-                      item.imageProfile
-                        ? { uri: item.imageProfile }
+                      item.imageUrl
+                        ? { uri: item.imageUrl }
                         : require("../assets/images/profile.jpg")
                     }
                     className="w-full h-28 rounded-xl mb-2"
@@ -218,19 +218,24 @@ export default function Home() {
           Quick Actions
         </Text>
         <View className="flex-row flex-wrap px-6">
-          {["guides", "cities", "bookings", "promotions", "favorites"].map(
-            (action) => (
-              <Pressable
-                key={action}
-                onPress={() => router.push(`/${action.toLowerCase()}` as any)}
-                className="bg-yellow-400 rounded-xl p-4 w-[45%] m-2"
-              >
-                <Text className="font-semibold text-center capitalize text-white">
-                  {action}
-                </Text>
-              </Pressable>
-            ),
-          )}
+          {[
+            "guides",
+            "cities",
+            "bookings",
+            "promotions",
+            "favorites",
+            "upcoming",
+          ].map((action) => (
+            <Pressable
+              key={action}
+              onPress={() => router.push(`/${action.toLowerCase()}` as any)}
+              className="bg-yellow-400 rounded-xl p-4 w-[45%] m-2"
+            >
+              <Text className="font-semibold text-center capitalize text-white">
+                {action}
+              </Text>
+            </Pressable>
+          ))}
         </View>
 
         {/* Testimonials */}

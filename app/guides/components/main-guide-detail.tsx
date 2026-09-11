@@ -1,5 +1,7 @@
 import BackButton from "@/app/_components/back-button";
+import AuthenticationModal from "@/components/authentication";
 import GlassCalendar from "@/components/glass-calendar";
+import { LoadingScreen } from "@/components/loading-screen";
 import {
   AvailableDayModel,
   useAddAvailableDay,
@@ -40,17 +42,19 @@ export default function MainGuideDetail() {
   const { data: guide, isPending } = useGetGuideById(id);
 
   if (isPending) {
-    return (
-      <View className="flex-1 items-center justify-center bg-gray-100">
-        <Text className="text-lg font-bold">Fetching...</Text>
-      </View>
-    );
+    return <LoadingScreen />;
   }
 
   if (!guide) {
     return (
-      <View className="flex-1 items-center justify-center bg-gray-100">
-        <Text className="text-lg font-bold">Guide not found</Text>
+      <View className="rounded-2xl bg-white/80 backdrop-blur-md p-4 mx-2 mt-6 mb-6 border border-gray-300">
+        <Text className="mb-2 text-xl font-bold text-gray-900">
+          Guide Profile
+        </Text>
+
+        <Text className="mb-6 text-gray-600">
+          There is no guide data available. Please log in or register again.
+        </Text>
       </View>
     );
   }
@@ -83,10 +87,13 @@ export default function MainGuideDetail() {
     );
   };
 
-  const handleUpdateAvailable = (data: AvailableDraftDayType) => {
+  const handleUpdateAvailable = async (
+    data: AvailableDraftDayType,
+  ): Promise<void> => {
     setUpdatingId(data.id);
-    updateAvailable.mutate(
-      {
+
+    try {
+      await updateAvailable.mutateAsync({
         id: data.id,
         userId: guide?.id,
         startDate: data.startDate || undefined,
@@ -94,25 +101,24 @@ export default function MainGuideDetail() {
         status: data.status || undefined,
         remark: data.remark,
         availableTimes: data.availableTimes || [],
-      },
-      {
-        onSuccess: async (data) => {
-          Toast.show({
-            type: "success",
-            text1: "Success",
-            text2: "Update day.",
-          });
-        },
-        onError: (err: any) => {
-          Toast.show({
-            type: "error",
-            text1: "Add failed",
-            text2: err?.message ?? "Something went wrong.",
-          });
-        },
-        onSettled: () => setUpdatingId(null),
-      },
-    );
+      });
+
+      Toast.show({
+        type: "success",
+        text1: "Success",
+        text2: "Update day.",
+      });
+    } catch (err: any) {
+      Toast.show({
+        type: "error",
+        text1: "Update failed",
+        text2: err?.message ?? "Something went wrong.",
+      });
+
+      throw err;
+    } finally {
+      setUpdatingId(null);
+    }
   };
 
   const handleDeleteAvailable = (id: string) => {
@@ -173,7 +179,7 @@ export default function MainGuideDetail() {
           )}
           ListHeaderComponent={
             <>
-              <BackButton title={guide?.username || "Unknown"} />
+              <BackButton title={guide?.fullName || "Unknown"} />
               {isProfileOwner && (
                 <SwitchButtonView
                   activeView={activeView}
@@ -202,6 +208,8 @@ export default function MainGuideDetail() {
           }
           contentContainerStyle={{ padding: 0 }}
         />
+
+        <AuthenticationModal />
       </ImageBackground>
     </>
   );

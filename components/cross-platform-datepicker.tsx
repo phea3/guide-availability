@@ -1,10 +1,14 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import { useState } from "react";
 import { Button, Platform, View } from "react-native";
 
 dayjs.extend(customParseFormat);
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export default function CrossPlatformDatePicker({
   label,
@@ -20,26 +24,46 @@ export default function CrossPlatformDatePicker({
   const [show, setShow] = useState(Platform.OS === "ios");
 
   const onChange = (event: any, selectedDate?: Date) => {
-    if (Platform.OS === "android") setShow(false);
-    if (event.type === "set" && selectedDate) {
-      if (mode === "time") {
-        // merge time into existing date
-        const newDate = dayjs(date)
-          .hour(dayjs(selectedDate).hour())
-          .minute(dayjs(selectedDate).minute())
-          .toDate();
-        setDate(newDate);
-      } else {
-        setDate(selectedDate);
-      }
+    if (Platform.OS === "android") {
+      setShow(false);
     }
+
+    if (event.type !== "set" || !selectedDate) return;
+
+    if (mode === "time") {
+      // Keep the existing date and only replace hours/minutes.
+      const newDate = new Date(date);
+
+      newDate.setHours(
+        selectedDate.getHours(),
+        selectedDate.getMinutes(),
+        0,
+        0,
+      );
+
+      setDate(newDate);
+      return;
+    }
+
+    setDate(selectedDate);
   };
 
   return (
     <View>
       {Platform.OS === "android" && (
-        <Button title={label} onPress={() => setShow(true)} />
+        <Button
+          title={
+            mode === "time"
+              ? `${label}: ${date.toLocaleTimeString([], {
+                  hour: "numeric",
+                  minute: "2-digit",
+                })}`
+              : label
+          }
+          onPress={() => setShow(true)}
+        />
       )}
+
       {show && (
         <DateTimePicker
           value={date}
