@@ -263,7 +263,6 @@ export default function GlassCalendar({
               </View>
             </Animated.View>
 
-<<<<<<< HEAD
             {/* Legend */}
             <View className="mx-5 mb-5 flex-row flex-wrap items-center justify-center gap-x-5 gap-y-2 rounded-2xl border border-gray-100 bg-white/80 px-4 py-3">
               <View className="flex-row items-center gap-2">
@@ -272,10 +271,6 @@ export default function GlassCalendar({
                   Available
                 </Text>
               </View>
-=======
-                textSectionTitleColor: "#000000",
-                monthTextColor: "#ffffff",
->>>>>>> 157657e (update)
 
               <View className="flex-row items-center gap-2">
                 <View className="h-2.5 w-2.5 rounded-full bg-slate-400" />
