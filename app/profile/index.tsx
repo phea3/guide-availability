@@ -28,6 +28,7 @@ export default function ProfilePage() {
     username: "",
     email: "",
     phoneNumber: "",
+    telegramLink: "",
     description: "",
     status: "",
     role: "",
@@ -48,6 +49,7 @@ export default function ProfilePage() {
         username: user.username || "",
         email: user.email || "",
         phoneNumber: user.phoneNumber || "",
+        telegramLink: user.telegramLink || "",
         description: user.description || "",
         status: user.status || "",
         role: user.role || "",
@@ -265,6 +267,11 @@ export default function ProfilePage() {
               {renderEditableRow({
                 title: "Phone",
                 field: "phoneNumber",
+              })}
+
+              {renderEditableRow({
+                title: "Telegram",
+                field: "telegramLink",
               })}
 
               {renderEditableRow({

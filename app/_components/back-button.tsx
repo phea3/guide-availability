@@ -1,47 +1,69 @@
-"use client";
-
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Image, Pressable, Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
   title?: string;
   color?: string;
+  imageUrl?: string;
+  onProfilePress?: () => void;
 };
-export default function BackButton({ title, color }: Props) {
+
+export default function BackButton({
+  title,
+  color,
+  imageUrl,
+  onProfilePress,
+}: Props) {
   const router = useRouter();
 
   return (
     <View
-      className={`p-4 flex flex-row relative ${color ? `bg-[${color}]` : "bg-[#c9a849]"}`}
+      className="relative mx-4 mt-3 flex-row items-center justify-between rounded-2xl px-3 py-3"
+      style={{ backgroundColor: color ?? "#fbbf24", minHeight: 56 }}
     >
+      {/* Back button */}
       <TouchableOpacity
         onPress={() => router.back()}
-        className="absolute top-3 left-3 w-10 h-10 flex items-center justify-center border border-white rounded-full"
+        accessibilityRole="button"
+        accessibilityLabel="Go back"
+        activeOpacity={0.7}
+        className="h-10 w-10 items-center justify-center rounded-full border border-white/60"
       >
-        <Ionicons
-          name="chevron-back"
-          size={20}
-          a
-          color="white"
-          className="items-center justify-center "
-        />
+        <Ionicons name="chevron-back" size={22} color="white" />
       </TouchableOpacity>
-      <View className="flex-1 items-center">
-        <Text className="text-lg font-bold text-white">{title}</Text>
+
+      {/* Center title */}
+      <View className="absolute left-14 right-14 items-center">
+        <Text
+          className="text-base font-bold text-white"
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {title || "Back"}
+        </Text>
       </View>
-      {/* <TouchableOpacity
-        onPress={() => router.back()}
-        className="absolute top-3 right-3 w-10 h-10 flex items-center justify-center border border-white rounded-full"
+
+      {/* Profile image */}
+      <Pressable
+        onPress={onProfilePress}
+        disabled={!onProfilePress}
+        accessibilityRole={onProfilePress ? "button" : undefined}
+        accessibilityLabel="Profile image"
+        className="h-10 w-10 items-center justify-center overflow-hidden rounded-full"
       >
-        <Ionicons
-          name="dot"
-          size={20}
-          a
-          color="white"
-          className="items-center justify-center "
-        />
-      </TouchableOpacity> */}
+        {imageUrl ? (
+          <Image
+            source={{ uri: imageUrl }}
+            className="h-full w-full"
+            resizeMode="cover"
+          />
+        ) : (
+          <View className="h-full w-full items-center justify-center bg-white/20">
+            <Ionicons name="person" size={21} color="white" />
+          </View>
+        )}
+      </Pressable>
     </View>
   );
 }

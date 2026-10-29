@@ -5,6 +5,7 @@ export type GuideType = {
   nationality?: string;
   email?: string;
   phoneNumber?: string;
+  telegramLink?: string;
   address?: string;
   profileImage?: string;
   status?: string;

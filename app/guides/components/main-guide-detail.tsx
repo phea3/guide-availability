@@ -1,5 +1,6 @@
 import BackButton from "@/app/_components/back-button";
 import AuthenticationModal from "@/components/authentication";
+import ConfirmAlert from "@/components/confirm-alert";
 import GlassCalendar from "@/components/glass-calendar";
 import { LoadingScreen } from "@/components/loading-screen";
 import {
@@ -38,8 +39,12 @@ export default function MainGuideDetail() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
+  // alert for delete
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [selectedDeleteId, setSelectedDeleteId] = useState<string | null>(null);
+
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
-  const { data: guide, isPending } = useGetGuideById(id);
+  const { data: guide, isPending } = useGetGuideById(id || "");
 
   if (isPending) {
     return <LoadingScreen />;
@@ -122,14 +127,25 @@ export default function MainGuideDetail() {
   };
 
   const handleDeleteAvailable = (id: string) => {
-    setDeletingId(id);
-    deleteAvailable.mutate(id, {
+    setSelectedDeleteId(id);
+    setConfirmDelete(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (!selectedDeleteId) return;
+
+    setDeletingId(selectedDeleteId);
+
+    deleteAvailable.mutate(selectedDeleteId, {
       onSuccess: async () => {
         Toast.show({
           type: "success",
           text1: "Success",
-          text2: "Delete day.",
+          text2: "Availability day deleted.",
         });
+
+        setConfirmDelete(false);
+        setSelectedDeleteId(null);
       },
       onError: (err: any) => {
         Toast.show({
@@ -144,7 +160,7 @@ export default function MainGuideDetail() {
 
   const isProfileOwner = isYourProfile({
     userId,
-    guideUserId: guide?.clerkUserId,
+    guideUserId: guide?.id,
   });
 
   return (
@@ -179,14 +195,19 @@ export default function MainGuideDetail() {
           )}
           ListHeaderComponent={
             <>
-              <BackButton title={guide?.fullName || "Unknown"} />
+              <BackButton
+                title={guide?.fullName || "Unknown"}
+                imageUrl={guide?.imageUrl}
+              />
               {isProfileOwner && (
                 <SwitchButtonView
                   activeView={activeView}
                   setActiveView={setActiveView}
                 />
               )}
-              {activeView === "calendar" && <GlassCalendar />}
+              {activeView === "calendar" && (
+                <GlassCalendar data={availableDays || []} guide={guide} />
+              )}
               {isProfileOwner && activeView === "setup" && (
                 <SetupForm
                   startDate={startDate}
@@ -211,6 +232,23 @@ export default function MainGuideDetail() {
 
         <AuthenticationModal />
       </ImageBackground>
+
+      <ConfirmAlert
+        visible={confirmDelete}
+        title="Delete availability?"
+        message="Are you sure you want to delete this availability day? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        destructive
+        isLoading={deleteAvailable.isPending}
+        onCancel={() => {
+          if (deleteAvailable.isPending) return;
+
+          setConfirmDelete(false);
+          setSelectedDeleteId(null);
+        }}
+        onConfirm={handleConfirmDelete}
+      />
     </>
   );
 }

@@ -1,6 +1,6 @@
+import { CalendarDays, Settings2 } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
 
-/* Switch buttons */
 export default function SwitchButtonView({
   activeView,
   setActiveView,
@@ -8,25 +8,44 @@ export default function SwitchButtonView({
   activeView: "calendar" | "setup" | "hide";
   setActiveView: (view: "calendar" | "setup") => void;
 }) {
+  const isCalendar = activeView === "calendar";
+
   return (
-    <View className="flex-row gap-3 mx-4 mt-4">
+    <View className="mx-4 mt-4 rounded-2xl bg-stone-100 p-1.5 flex-row">
       <Pressable
         onPress={() => setActiveView("calendar")}
-        className={`flex-1 rounded-xl py-3 ${
-          activeView === "calendar" ? "bg-[#7e5f03]" : "bg-[#c9a849]"
+        accessibilityRole="tab"
+        accessibilityState={{ selected: isCalendar }}
+        className={`flex-1 flex-row items-center justify-center gap-2 rounded-xl py-3 ${
+          isCalendar ? "bg-white " : "bg-transparent"
         }`}
       >
-        <Text className="text-center text-white font-medium">
+        <CalendarDays size={18} color={isCalendar ? "#7e5f03" : "#78716c"} />
+        <Text
+          className={`text-sm font-semibold ${
+            isCalendar ? "text-[#7e5f03]" : "text-stone-500"
+          }`}
+        >
           Calendar View
         </Text>
       </Pressable>
+
       <Pressable
         onPress={() => setActiveView("setup")}
-        className={`flex-1 rounded-xl py-3 ${
-          activeView === "setup" ? "bg-[#7e5f03]" : "bg-[#c9a849]"
+        accessibilityRole="tab"
+        accessibilityState={{ selected: !isCalendar }}
+        className={`flex-1 flex-row items-center justify-center gap-2 rounded-xl py-3 ${
+          !isCalendar ? "bg-white " : "bg-transparent"
         }`}
       >
-        <Text className="text-center text-white font-medium">Day Setup</Text>
+        <Settings2 size={18} color={!isCalendar ? "#7e5f03" : "#78716c"} />
+        <Text
+          className={`text-sm font-semibold ${
+            !isCalendar ? "text-[#7e5f03]" : "text-stone-500"
+          }`}
+        >
+          Day Setup
+        </Text>
       </Pressable>
     </View>
   );

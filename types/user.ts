@@ -4,6 +4,7 @@ export type UserType = {
   username?: string;
   email?: string;
   phoneNumber?: string;
+  telegramLink?: string;
   verifiedEmail?: string;
   hashPassword?: string;
   imageUrl?: string;
