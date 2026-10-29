@@ -54,7 +54,11 @@ export default function BackButton({
       >
         {imageUrl ? (
           <Image
-            source={{ uri: imageUrl }}
+            source={
+              imageUrl
+                ? { uri: imageUrl }
+                : require("../../assets/images/profile.jpg")
+            }
             className="h-full w-full"
             resizeMode="cover"
           />

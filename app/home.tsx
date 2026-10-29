@@ -11,6 +11,7 @@ import {
   Text,
   View,
 } from "react-native";
+import TopGuide from "./_components/top-guide";
 
 const heroSlides = [
   {
@@ -256,17 +257,7 @@ export default function Home() {
         <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
           Top Guides
         </Text>
-        {events.map((e) => (
-          <View
-            key={e.id}
-            className="bg-white/80 backdrop-blur-md rounded-2xl p-4 mx-6 mb-4 border border-gray-300"
-          >
-            <Text className="font-bold text-lg text-black">{e.name}</Text>
-            <Text className="text-gray-600">
-              {e.date} — {e.location}
-            </Text>
-          </View>
-        ))}
+        <TopGuide />
       </ScrollView>
     </ImageBackground>
   );

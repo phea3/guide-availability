@@ -62,17 +62,21 @@ export default function Guides() {
                 accessibilityLabel={`View guide ${item.fullName || item.username || ""}`}
               >
                 {/* Profile image */}
-                {item.imageUrl ? (
-                  <Image
-                    source={{ uri: item.imageUrl }}
-                    className="h-16 w-16 rounded-full bg-stone-100"
-                    resizeMode="cover"
-                  />
-                ) : (
+                {/* {item.imageUrl ? ( */}
+                <Image
+                  source={
+                    item.imageUrl
+                      ? { uri: item.imageUrl }
+                      : require("../../assets/images/profile.jpg")
+                  }
+                  className="h-16 w-16 rounded-full bg-stone-100"
+                  resizeMode="cover"
+                />
+                {/* ) : (
                   <View className="h-16 w-16 items-center justify-center rounded-full bg-[#c9a849]/15">
                     <Ionicons name="person" size={30} color="#7e5f03" />
                   </View>
-                )}
+                )} */}
 
                 {/* Guide information */}
                 <View className="ml-4 flex-1 justify-center">
