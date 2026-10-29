@@ -1,4 +1,4 @@
-import BackButtonDefault from "@/components/back-button-default";
+import BackHomeDefault from "@/components/back-home";
 import { useRegister } from "@/hook/use-register";
 import { useAuth } from "@clerk/expo";
 import { useSignInWithApple } from "@clerk/expo/apple";
@@ -12,7 +12,6 @@ import {
   Platform,
   Pressable,
   Text,
-  TextInput,
   View,
 } from "react-native";
 
@@ -67,7 +66,7 @@ export default function Register() {
 
     await register.mutateAsync({
       data: {
-        fullName: fullName.trim(),
+        // fullName: fullName.trim(),
         role,
       },
       token,
@@ -142,7 +141,7 @@ export default function Register() {
       const { createdSessionId, setActive } =
         await startGoogleAuthenticationFlow({
           unsafeMetadata: {
-            fullName: fullName.trim(),
+            // fullName: fullName.trim(),
             role,
           },
         });
@@ -195,7 +194,7 @@ export default function Register() {
       const { createdSessionId, setActive } =
         await startAppleAuthenticationFlow({
           unsafeMetadata: {
-            fullName: fullName.trim(),
+            // fullName: fullName.trim(),
             role,
           },
         });
@@ -237,21 +236,22 @@ export default function Register() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <View className="flex-1 justify-center bg-gray-100 p-6">
-        <BackButtonDefault />
+        <BackHomeDefault />
 
         <Text className="mb-6 text-center text-3xl font-bold">
           Create Account
         </Text>
 
         {/* Full Name */}
-        <TextInput
+        {/* <TextInput
+          // onSubmitEditing={() => Keyboard.dismiss()}
           placeholder="Full Name"
           value={fullName}
           onChangeText={setFullName}
           autoCapitalize="words"
           editable={!isPending}
           className="mb-4 rounded-xl bg-white p-4"
-        />
+        /> */}
 
         {/* Role */}
         <View className="mb-4 flex-row gap-3">

@@ -1,5 +1,6 @@
 import AuthenticationModal from "@/components/authentication";
 import { useGetGuide } from "@/hook/use-all-guide";
+import useCheckUserNotCompletedProfile from "@/hook/use-check-user-not-completed-profile";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import {
@@ -12,6 +13,7 @@ import {
 } from "react-native";
 
 export default function Guides() {
+  useCheckUserNotCompletedProfile();
   const { data: guides } = useGetGuide();
 
   if (!guides) return null;

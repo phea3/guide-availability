@@ -1,5 +1,6 @@
 import { useGetGuide } from "@/hook/use-all-guide";
-import { Link, router } from "expo-router";
+import useCheckUserNotCompletedProfile from "@/hook/use-check-user-not-completed-profile";
+import { Link, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   FlatList,
@@ -8,7 +9,6 @@ import {
   Pressable,
   ScrollView,
   Text,
-  TextInput,
   View,
 } from "react-native";
 
@@ -88,7 +88,9 @@ const events = [
 ];
 
 export default function Home() {
+  useCheckUserNotCompletedProfile();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const router = useRouter();
 
   const { data: guides } = useGetGuide();
 
@@ -124,7 +126,7 @@ export default function Home() {
             </Text>
           </View>
         </ImageBackground>
-        <View className="p-6">
+        {/* <View className="p-6">
           <Text className="text-lg text-gray-600 mb-6">
             Explore Cambodia with trusted local guides
           </Text>
@@ -137,9 +139,9 @@ export default function Home() {
           <Text className="text-gray-400">
             Suggestions: John, Sokha, Siem Reap
           </Text>
-        </View>
+        </View> */}
 
-        <Text className="text-2xl font-bold text-black px-6 mb-4">
+        {/* <Text className="text-2xl font-bold text-black px-6 mb-4">
           Promotions
         </Text>
         <View className="px-6">
@@ -154,7 +156,7 @@ export default function Home() {
               </View>
             )}
           />
-        </View>
+        </View> */}
 
         <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
           Recently Guides
@@ -196,7 +198,7 @@ export default function Home() {
           />
         </View>
 
-        <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
+        {/* <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
           Explore Cities
         </Text>
         <FlatList
@@ -213,8 +215,8 @@ export default function Home() {
               </Text>
             </View>
           )}
-        />
-        <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
+        /> */}
+        {/* <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
           Quick Actions
         </Text>
         <View className="flex-row flex-wrap px-6">
@@ -236,10 +238,10 @@ export default function Home() {
               </Text>
             </Pressable>
           ))}
-        </View>
+        </View> */}
 
         {/* Testimonials */}
-        <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
+        {/* <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
           Testimonials
         </Text>
         {testimonials.map((t) => (
@@ -249,10 +251,10 @@ export default function Home() {
           >
             <Text className="text-gray-800 italic">{t.text}</Text>
           </View>
-        ))}
+        ))} */}
 
         <Text className="text-2xl font-bold text-black px-6 mt-8 mb-4">
-          Upcoming Events
+          Top Guides
         </Text>
         {events.map((e) => (
           <View

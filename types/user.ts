@@ -20,4 +20,5 @@ export type UserType = {
   lastLoginAt?: string;
   createdAt?: string;
   clerkUserId?: string;
+  isCompletedProfile?: boolean | null;
 };

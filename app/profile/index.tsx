@@ -36,7 +36,7 @@ export default function ProfilePage() {
 
   const [editing, setEditing] = useState<string | null>(null);
 
-  const { data: user } = useGetUserById(userId || "");
+  const { data: user, refetch } = useGetUserById(userId || "");
 
   const updateProfile = useProfileDetail();
 
@@ -67,8 +67,10 @@ export default function ProfilePage() {
     title,
     field,
     options,
+    isDisabled,
   }: {
     title: string;
+    isDisabled?: boolean;
     field: keyof typeof form;
     options?: string[];
   }) => {
@@ -97,6 +99,7 @@ export default function ProfilePage() {
             </Picker>
           ) : (
             <TextInput
+              editable={!isDisabled}
               autoFocus
               value={String(form[field] ?? "")}
               onChangeText={(text) =>
@@ -194,7 +197,7 @@ export default function ProfilePage() {
                 </View>
               )} */}
 
-              {user?.role === "Guide" && (
+              {user?.role === "Guide" && user.isCompletedProfile && (
                 <View className="mx-4 mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4">
                   <View className="flex-row items-center">
                     <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-amber-100">
@@ -207,7 +210,7 @@ export default function ProfilePage() {
 
                     <View className="flex-1">
                       <Text className="text-base font-bold text-gray-900">
-                        Complete your guide availability profile
+                        Complete your guide availability
                       </Text>
 
                       <Text className="mt-1 text-sm text-gray-600">
@@ -225,7 +228,7 @@ export default function ProfilePage() {
                   >
                     <Pressable className="mt-4 flex-row items-center justify-center rounded-xl bg-amber-500 px-4 py-3">
                       <Text className="font-bold text-white">
-                        Complete Profile
+                        Set Availability
                       </Text>
                       <Ionicons
                         name="arrow-forward"
@@ -262,6 +265,7 @@ export default function ProfilePage() {
               {renderEditableRow({
                 title: "Email",
                 field: "email",
+                isDisabled: true,
               })}
 
               {renderEditableRow({
@@ -295,6 +299,22 @@ export default function ProfilePage() {
             <Pressable
               disabled={updateProfile.isPending}
               onPress={() => {
+                if (!form.fullName || !form.username || !form.phoneNumber) {
+                  Toast.show({
+                    type: "error",
+                    text1: "Update failed",
+                    text2: !form.fullName
+                      ? "Full Name is required."
+                      : !form.username
+                        ? "Username is required."
+                        : !form.phoneNumber
+                          ? "Phone number is required."
+                          : "Something went wrong.",
+                  });
+
+                  return;
+                }
+
                 updateProfile.mutate(
                   {
                     ...form,
@@ -302,6 +322,7 @@ export default function ProfilePage() {
                   },
                   {
                     onSuccess: () => {
+                      refetch();
                       Toast.show({
                         type: "success",
                         text1: "Success",
